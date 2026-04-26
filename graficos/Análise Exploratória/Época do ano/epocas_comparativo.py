@@ -26,7 +26,14 @@ sns.set_style("whitegrid")
 
 # Criando o gráfico de linhas
 plot = sns.lineplot(data=df_plot, x='Mês', y='Volume de Procura', hue='Região', 
-                    marker='o', linewidth=3, palette=['#e74c3c', '#3498db', '#2ecc71', '#f1c40f'])
+                    marker='o', linewidth=2, palette=palette, alpha=0.7)
+
+palette = sns.color_palette("Blues", n_colors=4)
+
+plt.scatter(['Jul'], [100], color='#0b3c5d', s=120, zorder=5)
+plt.scatter(['Jan'], [100], color='#0b3c5d', s=120, zorder=5)
+
+
 
 # Customização para clareza total
 plt.title('Comparação de Procura por Época do Ano', fontsize=18, fontweight='bold', pad=20)
@@ -35,11 +42,11 @@ plt.xlabel('Meses do Ano', fontsize=12)
 plt.ylim(0, 110)
 
 # Adicionando anotações de "Pico" para facilitar a leitura
-plt.annotate('Pico de Inverno', xy=('Jul', 100), xytext=('Ago', 105),
-             arrowprops=dict(facecolor='black', shrink=0.05, width=1))
+plt.annotate('Pico de Inverno', xy=('Jul', 100), xytext=('Ago', 108),
+             arrowprops=dict(facecolor='#0b3c5d', width=2))
 
-plt.annotate('Pico de Verão', xy=('Jan', 100), xytext=('Fev', 105),
-             arrowprops=dict(facecolor='black', shrink=0.05, width=1))
+plt.annotate('Pico de Verão', xy=('Jan', 100), xytext=('Fev', 108),
+             arrowprops=dict(facecolor='#0b3c5d', width=2))
 
 plt.legend(title='Destinos', bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=11)
 plt.tight_layout()
