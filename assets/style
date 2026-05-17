@@ -1,0 +1,587 @@
+/* ════════════════════════════════════════════
+   Brasil em Foco — Global Styles
+   ════════════════════════════════════════════ */
+
+/* Define variáveis CSS globais (custom properties) para reutilização em todo o design */
+:root {
+  /* Cores principais - paleta azul marinha (navy) com variações de tonalidade */
+  --navy:        #1A2B6B;        /* Azul marinha padrão - cor primária da marca */
+  --navy-light:  #243580;        /* Azul marinha mais claro para destaques */
+  --navy-dark:   #111E52;        /* Azul marinha mais escuro para backgrounds */
+  
+  /* Cores de destaque e tema */
+  --accent:      #4A6CF7;        /* Azul vibrante para elementos interativos */
+  --accent-glow: rgba(74, 108, 247, 0.18); /* Sombra/brilho do accent com transparência */
+  --gold:        #F5A623;        /* Dourado para destaque de itens ativos */
+  --green:       #27AE60;        /* Verde para indicadores positivos */
+  --red:         #E74C3C;        /* Vermelho para alertas e valores negativos */
+  --teal:        #1ABC9C;        /* Ciano/teal para elementos secundários */
+
+  /* Cores de fundo e texto */
+  --bg:          #F0F2F8;        /* Fundo geral da página - cinza bem claro */
+  --card-bg:     #FFFFFF;        /* Fundo dos cards - branco puro */
+  --card-border: rgba(26, 43, 107, 0.08); /* Borda dos cards - navy com alta transparência */
+  --text-main:   #1A2B6B;        /* Cor de texto principal - navy */
+  --text-sub:    #6B7A9F;        /* Cor de texto secundário - cinza azulado */
+  --text-light:  #A8B3D1;        /* Cor de texto terciário - cinza claro */
+
+  /* Dimensões e espaçamento */
+  --sidebar-w:   260px;          /* Largura da sidebar fixa */
+  --radius:      16px;           /* Border-radius padrão para elementos grandes */
+  --radius-sm:   10px;           /* Border-radius menor para elementos compactos */
+  
+  /* Sombras para profundidade visual */
+  --shadow:      0 4px 24px rgba(26, 43, 107, 0.10); /* Sombra padrão - suave */
+  --shadow-lg:   0 8px 40px rgba(26, 43, 107, 0.16); /* Sombra grande - mais pronunciada */
+
+  /* Fontes tipográficas */
+  --font-head:   'Sora', sans-serif;       /* Fonte para títulos e headings */
+  --font-body:   'DM Sans', sans-serif;    /* Fonte para corpo de texto */
+}
+
+/* Reset global - remove margins e padding padrão de todos os elementos */
+* { 
+  box-sizing: border-box; /* Inclui padding e border no cálculo de width/height */
+  margin: 0;              /* Remove margin padrão do navegador */
+  padding: 0;             /* Remove padding padrão do navegador */
+}
+
+/* Estilos base para o elemento body */
+body {
+  font-family: var(--font-body);      /* Aplica fonte DM Sans em todo o documento */
+  background: var(--bg);              /* Fundo cinza claro (#F0F2F8) */
+  color: var(--text-main);            /* Cor de texto padrão - navy (#1A2B6B) */
+  -webkit-font-smoothing: antialiased; /* Suaviza renderização de fontes em navegadores webkit */
+}
+
+/* ── Sidebar ─────────────────────────────── */
+/* Barra lateral fixa com navegação principal */
+
+#sidebar {
+  width: var(--sidebar-w);              /* Largura fixa de 260px */
+  min-height: 100vh;                    /* Altura mínima da viewport */
+  background: linear-gradient(175deg, var(--navy-dark) 0%, var(--navy) 55%, #223A9A 100%); /* Gradiente azul escuro para azul */
+  display: flex;                        /* Utiliza flexbox para layout */
+  flex-direction: column;                /* Coloca itens em coluna (verticalmente) */
+  position: sticky;                     /* Fica fixa ao rolar a página */
+  top: 0;                               /* Alinhada ao topo */
+  flex-shrink: 0;                       /* Não encolhe em layouts flex */
+  box-shadow: 4px 0 32px rgba(17, 30, 82, 0.25); /* Sombra à direita da sidebar */
+  overflow: hidden;                     /* Remove overflow para manter design limpo */
+}
+
+/* Pseudo-elemento decorativo no topo da sidebar */
+#sidebar::before {
+  content: '';                          /* Cria um elemento vazio */
+  position: absolute;                   /* Posicionamento absoluto dentro da sidebar */
+  top: -80px; right: -80px;             /* Posicionado parcialmente fora de vista */
+  width: 220px; height: 220px;          /* Forma circular grande */
+  border-radius: 50%;                   /* Torna o elemento um círculo */
+  background: rgba(255,255,255,0.04);   /* Círculo branco com transparência mínima (decorativo) */
+  pointer-events: none;                 /* Elemento não interfere com interações */
+}
+
+/* Contêiner do logo e marca da sidebar */
+.sidebar-logo {
+  padding: 36px 28px 28px;              /* Espaçamento interno (topo, lados, base) */
+  display: flex;                        /* Usa flexbox */
+  flex-direction: column;                /* Alinha itens verticalmente */
+  align-items: center;                  /* Centraliza itens horizontalmente */
+  border-bottom: 1px solid rgba(255,255,255,0.08); /* Linha divisória branca com transparência */
+  margin-bottom: 8px;                   /* Espaço entre logo e itens de navegação */
+}
+
+/* Ícone circular da marca */
+.sidebar-logo-icon {
+  width: 54px; height: 54px;            /* Dimensões quadradas para ícone circular */
+  background: rgba(255,255,255,0.12);   /* Fundo branco com transparência */
+  border-radius: 50%;                   /* Torna o elemento um círculo perfeito */
+  display: flex; align-items: center; justify-content: center; /* Centraliza conteúdo */
+  font-size: 24px;                      /* Tamanho do ícone/emoji */
+  margin-bottom: 10px;                  /* Espaço entre ícone e título */
+  border: 2px solid rgba(255,255,255,0.18); /* Borda clara para definição */
+}
+
+/* Título/nome da marca */
+.sidebar-logo-title {
+  font-family: var(--font-head);        /* Usa fonte Sora (para títulos) */
+  font-size: 18px;                      /* Tamanho grande para destaque */
+  font-weight: 700;                     /* Negrito (weight 700) */
+  color: #FFFFFF;                       /* Branco puro */
+  letter-spacing: 2px;                  /* Espaçamento aumentado entre letras */
+  text-transform: uppercase;            /* Converte texto para MAIÚSCULAS */
+}
+
+/* Subtítulo/slogan da marca */
+.sidebar-logo-sub {
+  font-size: 10px;                      /* Texto bem pequeno */
+  font-weight: 400;                     /* Peso normal */
+  color: rgba(255,255,255,0.45);        /* Branco com transparência moderada */
+  letter-spacing: 3px;                  /* Espaçamento grande entre letras */
+  text-transform: uppercase;            /* Maiúsculas */
+  margin-top: 2px;                      /* Pequeno espaço do título */
+}
+
+/* ── Itens de navegação ──────────────────── */
+
+/* Rótulo das seções de navegação */
+.nav-section-label {
+  font-size: 9px;                       /* Texto muito pequeno */
+  font-weight: 600;                     /* Peso semi-bold */
+  letter-spacing: 2.5px;                /* Espaçamento grande entre letras */
+  text-transform: uppercase;            /* Maiúsculas */
+  color: rgba(255,255,255,0.30);        /* Branco com transparência alta (suave) */
+  padding: 20px 28px 8px;               /* Espaçamento (topo, lados, base) */
+}
+
+/* Estilo base para cada item de navegação */
+.nav-item {
+  display: flex;                        /* Flexbox para alinhar ícone + texto */
+  align-items: center;                  /* Centraliza itens verticalmente */
+  gap: 12px;                            /* Espaço entre ícone e texto */
+  padding: 13px 24px;                   /* Espaçamento interno */
+  margin: 3px 12px;                     /* Margem externa (espaço entre itens) */
+  border-radius: var(--radius-sm);      /* Cantos arredondados (10px) */
+  cursor: pointer;                      /* Muda cursor para indicar clicabilidade */
+  background: transparent;              /* Fundo transparente por padrão */
+  border: none;                         /* Remove borda padrão de botão */
+  color: rgba(255,255,255,0.60);        /* Branco com transparência média */
+  font-family: var(--font-body);        /* Fonte DM Sans */
+  font-size: 13.5px;                    /* Tamanho de texto */
+  font-weight: 500;                     /* Peso médio */
+  transition: all 0.22s ease;           /* Transição suave para efeitos hover */
+  text-align: left;                     /* Alinha texto à esquerda */
+  width: calc(100% - 24px);             /* Largura total menos margens (para simetria) */
+  position: relative;                   /* Para posicionar pseudo-elementos */
+  overflow: hidden;                     /* Esconde overflow dos pseudo-elementos */
+}
+
+/* Pseudo-elemento para efeito de brilho no hover */
+.nav-item::before {
+  content: '';                          /* Elemento vazio */
+  position: absolute;                   /* Posicionado dentro do nav-item */
+  inset: 0;                             /* Cobre toda a área do nav-item */
+  background: linear-gradient(90deg, rgba(255,255,255,0.10), transparent); /* Gradiente de brilho */
+  opacity: 0;                           /* Invisível por padrão */
+  transition: opacity 0.22s;            /* Transição suave da opacidade */
+}
+
+/* Efeito no hover - aumenta visibilidade */
+.nav-item:hover {
+  color: #FFFFFF;                       /* Texto fica branco puro */
+  background: rgba(255,255,255,0.08);   /* Fundo levemente preenchido */
+}
+
+.nav-item:hover::before { 
+  opacity: 1;                           /* Mostra o gradiente de brilho */
+}
+
+/* Estilo para item ativo (página atual) */
+.nav-item.active {
+  background: rgba(255,255,255,0.14);   /* Fundo mais preenchido que hover */
+  color: #FFFFFF;                       /* Texto branco */
+  font-weight: 600;                     /* Texto mais negrito */
+  box-shadow: 0 2px 16px rgba(0,0,0,0.15); /* Sombra sutil para destaque */
+}
+
+/* Barra dourada na direita do item ativo */
+.nav-item.active::after {
+  content: '';                          /* Elemento vazio */
+  position: absolute;                   /* Posicionado no canto direito */
+  right: 0; top: 20%; bottom: 20%;      /* Na borda direita, com margem vertical */
+  width: 3px;                           /* Barra fina */
+  border-radius: 4px;                   /* Cantos arredondados */
+  background: var(--gold);              /* Cor dourada (#F5A623) */
+}
+
+/* Ícone dentro do nav-item */
+.nav-item .nav-icon {
+  width: 32px; height: 32px;            /* Quadrado para ícone */
+  border-radius: 8px;                   /* Cantos suavemente arredondados */
+  display: flex; align-items: center; justify-content: center; /* Centraliza ícone */
+  font-size: 14px;                      /* Tamanho do ícone */
+  background: rgba(255,255,255,0.08);   /* Fundo suave */
+  flex-shrink: 0;                       /* Não encolhe em layouts flex */
+  transition: background 0.22s;         /* Transição suave da cor de fundo */
+}
+
+/* Ícone do item ativo tem fundo mais visível */
+.nav-item.active .nav-icon {
+  background: rgba(255,255,255,0.16);   /* Fundo mais preenchido */
+}
+
+/* Rodapé da sidebar (texto de copyright/versão) */
+.sidebar-footer {
+  margin-top: auto;                     /* Empurra para o final da sidebar (usando flex) */
+  padding: 20px 24px;                   /* Espaçamento interno */
+  border-top: 1px solid rgba(255,255,255,0.08); /* Linha divisória suave */
+  font-size: 11px;                      /* Texto pequeno */
+  color: rgba(255,255,255,0.30);        /* Branco com transparência alta */
+  text-align: center;                   /* Centraliza texto */
+  font-family: var(--font-head);        /* Usa fonte de título (Sora) */
+  letter-spacing: 1px;                  /* Espaçamento entre letras */
+}
+
+/* ── Cards ───────────────────────────────── */
+/* Estilo base para cards/painéis de conteúdo */
+
+.dash-card {
+  background: var(--card-bg);           /* Fundo branco */
+  border-radius: var(--radius);         /* Cantos arredondados (16px) */
+  box-shadow: var(--shadow);            /* Sombra padrão suave */
+  border: 1px solid var(--card-border); /* Borda cinza muito suave */
+  padding: 28px 32px;                   /* Espaçamento interno generoso */
+  transition: box-shadow 0.22s, transform 0.22s; /* Transições suaves para hover */
+}
+
+/* Efeito de elevação ao passar o mouse */
+.dash-card:hover {
+  box-shadow: var(--shadow-lg);         /* Sombra maior para efeito 3D */
+  transform: translateY(-2px);          /* Move ligeiramente para cima */
+}
+
+/* ── Metric tiles ─────────────────────────── */
+/* Cards pequenos para exibir métricas/KPIs com ícone e valor */
+
+.metric-tile {
+  background: var(--card-bg);           /* Fundo branco */
+  border-radius: var(--radius);         /* Cantos arredondados */
+  border: 1px solid var(--card-border); /* Borda suave */
+  padding: 20px 22px;                   /* Espaçamento interno (menor que dash-card) */
+  display: flex;                        /* Flexbox para layout */
+  flex-direction: column;                /* Itens em coluna (vertical) */
+  gap: 10px;                            /* Espaço entre elementos */
+  box-shadow: 0 2px 12px rgba(26, 43, 107, 0.07); /* Sombra suave */
+  transition: all 0.22s ease;           /* Transição suave para efeitos */
+  position: relative;                   /* Para posicionar pseudo-elementos */
+  overflow: hidden;                     /* Esconde overflow (barra colorida) */
+}
+
+/* Efeito de elevação ao passar o mouse */
+.metric-tile:hover {
+  transform: translateY(-3px);          /* Move mais para cima que cards normais */
+  box-shadow: var(--shadow-lg);         /* Sombra maior */
+}
+
+/* Barra colorida no topo do metric tile */
+.metric-tile::before {
+  content: '';                          /* Elemento vazio */
+  position: absolute;                   /* Posicionado no topo */
+  top: 0; left: 0; right: 0;            /* Ocupa toda largura no topo */
+  height: 3px;                          /* Altura fina */
+  border-radius: var(--radius) var(--radius) 0 0; /* Cantos arredondados no topo */
+}
+
+/* Define cor da barra para cada variação de cor */
+.metric-tile.color-blue::before   { background: var(--accent); }   /* Azul */
+.metric-tile.color-gold::before   { background: var(--gold); }     /* Dourado */
+.metric-tile.color-green::before  { background: var(--green); }    /* Verde */
+.metric-tile.color-teal::before   { background: var(--teal); }     /* Ciano */
+.metric-tile.color-red::before    { background: var(--red); }      /* Vermelho */
+.metric-tile.color-navy::before   { background: var(--navy); }     /* Navy */
+
+/* Ícone dentro do metric tile */
+.metric-tile-icon {
+  width: 44px; height: 44px;            /* Quadrado para ícone */
+  border-radius: 12px;                  /* Cantos arredondados */
+  display: flex; align-items: center; justify-content: center; /* Centraliza ícone */
+  font-size: 18px;                      /* Tamanho do ícone */
+  flex-shrink: 0;                       /* Não encolhe */
+}
+
+/* Fundo e cor do ícone para cada variação */
+.metric-tile.color-blue   .metric-tile-icon { background: rgba(74,108,247,0.10); color: var(--accent); }
+.metric-tile.color-gold   .metric-tile-icon { background: rgba(245,166,35,0.10); color: var(--gold); }
+.metric-tile.color-green  .metric-tile-icon { background: rgba(39,174,96,0.10);  color: var(--green); }
+.metric-tile.color-teal   .metric-tile-icon { background: rgba(26,188,156,0.10); color: var(--teal); }
+.metric-tile.color-red    .metric-tile-icon { background: rgba(231,76,60,0.10);  color: var(--red); }
+.metric-tile.color-navy   .metric-tile-icon { background: rgba(26,43,107,0.10);  color: var(--navy); }
+
+/* Rótulo/label da métrica */
+.metric-tile-label {
+  font-size: 11px;                      /* Texto pequeno */
+  font-weight: 600;                     /* Semi-bold */
+  text-transform: uppercase;            /* Maiúsculas */
+  letter-spacing: 1.2px;                /* Espaçamento entre letras */
+  color: var(--text-sub);               /* Cinza azulado */
+}
+
+/* Valor numérico da métrica */
+.metric-tile-value {
+  font-family: var(--font-head);        /* Fonte de título (Sora) */
+  font-size: 22px;                      /* Tamanho grande para destaque */
+  font-weight: 700;                     /* Bold */
+  color: var(--text-main);              /* Navy */
+  line-height: 1.1;                     /* Altura de linha compacta */
+}
+
+/* Texto secundário (comparação/período) */
+.metric-tile-sub {
+  font-size: 11px;                      /* Texto pequeno */
+  color: var(--text-light);             /* Cinza claro */
+}
+
+/* ── Barra de ranking/progresso ──────────── */
+
+/* Contêiner da barra de ranking */
+.ranking-bar-wrap {
+  margin-top: 4px;                      /* Pequeno espaço acima */
+}
+
+/* Rótulo da barra com valores */
+.ranking-bar-label {
+  font-size: 10px;                      /* Texto pequeno */
+  color: var(--text-sub);               /* Cinza azulado */
+  margin-bottom: 4px;                   /* Espaço abaixo */
+  display: flex;                        /* Flexbox */
+  justify-content: space-between;       /* Distribui rótulo e valor nas extremidades */
+}
+
+/* Fundo/trilho da barra de progresso */
+.ranking-bar-track {
+  height: 5px;                          /* Barra fina */
+  background: #E8EBF5;                  /* Cinza claro (fundo) */
+  border-radius: 99px;                  /* Cantos muito arredondados (pill shape) */
+  overflow: hidden;                     /* Esconde preenchimento que saia do trilho */
+}
+
+/* Preenchimento da barra de progresso */
+.ranking-bar-fill {
+  height: 100%;                         /* Ocupa altura total do trilho */
+  border-radius: 99px;                  /* Cantos arredondados */
+  transition: width 0.6s ease;          /* Transição suave da largura */
+}
+
+/* ── Títulos e headings ──────────────────── */
+
+/* Título principal da página */
+.page-title {
+  font-family: var(--font-head);        /* Fonte Sora */
+  font-size: 26px;                      /* Tamanho grande */
+  font-weight: 700;                     /* Bold */
+  color: var(--text-main);              /* Navy */
+  letter-spacing: -0.5px;               /* Espaçamento negativo (mais próximo) */
+  line-height: 1.2;                     /* Altura de linha compacta */
+}
+
+/* Subtítulo da página */
+.page-subtitle {
+  font-size: 14px;                      /* Tamanho médio */
+  color: var(--text-sub);               /* Cinza azulado */
+  margin-top: 6px;                      /* Espaço abaixo do título */
+  font-weight: 400;                     /* Peso normal */
+}
+
+/* Título de seção dentro da página */
+.section-title {
+  font-family: var(--font-head);        /* Fonte Sora */
+  font-size: 15px;                      /* Tamanho médio */
+  font-weight: 600;                     /* Semi-bold */
+  color: var(--text-main);              /* Navy */
+  letter-spacing: -0.2px;               /* Espaçamento ligeiramente negativo */
+}
+
+/* Linha divisória entre seções */
+.divider {
+  border: none;                         /* Remove borda padrão */
+  border-top: 1px solid var(--card-border); /* Linha superior suave */
+  margin: 20px 0;                       /* Espaço acima e abaixo */
+}
+
+/* ── Página de informações - layout ──────── */
+
+/* Bloco individual de informação (label + valor) */
+.info-block {
+  display: flex;                        /* Flexbox para alinhar label e valor */
+  align-items: baseline;                /* Alinha itens pela baseline do texto */
+  gap: 10px;                            /* Espaço entre label e valor */
+  padding: 14px 0;                      /* Espaçamento vertical */
+  border-bottom: 1px solid #EEF0F8;     /* Linha divisória suave */
+}
+
+/* Remove borda do último bloco */
+.info-block:last-child { 
+  border-bottom: none;                  /* Sem linha divisória no final */
+}
+
+/* Rótulo do bloco de informação */
+.info-label {
+  font-weight: 700;                     /* Bold */
+  font-size: 13px;                      /* Texto pequeno */
+  color: var(--navy);                   /* Navy */
+  min-width: 120px;                     /* Largura mínima para alinhamento */
+  font-family: var(--font-head);        /* Fonte Sora */
+}
+
+/* Valor do bloco de informação */
+.info-value {
+  font-size: 14px;                      /* Tamanho legível */
+  color: var(--text-sub);               /* Cinza azulado */
+}
+
+/* Lista com bullets/pontos */
+.bullet-list {
+  list-style: none;                     /* Remove bullets padrão */
+  padding: 0;                           /* Remove padding padrão */
+}
+
+/* Item individual da lista com bullet */
+.bullet-list li {
+  position: relative;                   /* Para posicionar bullet customizado */
+  padding: 7px 0 7px 22px;              /* Espaço para bullet à esquerda */
+  font-size: 14px;                      /* Tamanho legível */
+  color: var(--text-sub);               /* Cinza azulado */
+  line-height: 1.55;                    /* Altura de linha generosa */
+}
+
+/* Bullet customizado (ponto azul) */
+.bullet-list li::before {
+  content: '';                          /* Elemento vazio */
+  position: absolute;                   /* Posicionado à esquerda */
+  left: 0; top: 16px;                   /* Alinhado com o texto */
+  width: 8px; height: 8px;              /* Tamanho pequeno do ponto */
+  border-radius: 50%;                   /* Torna um círculo perfeito */
+  background: var(--accent);            /* Cor azul (accent) */
+  transform: translateY(-50%);          /* Centraliza verticalmente */
+}
+
+/* ── Faixa de abas (tabs) ────────────────── */
+
+/* Contêiner das abas */
+.tab-strip {
+  display: flex;                        /* Flexbox para layout horizontal */
+  gap: 6px;                             /* Espaço entre abas */
+  background: rgba(26, 43, 107, 0.06);   /* Fundo cinza azulado suave */
+  padding: 5px;                         /* Espaçamento interno */
+  border-radius: 12px;                  /* Cantos arredondados */
+  width: fit-content;                   /* Largura ajustada ao conteúdo */
+}
+
+/* Botão de aba */
+.tab-btn {
+  padding: 8px 22px;                    /* Espaçamento interno */
+  border: none;                         /* Sem borda */
+  border-radius: 9px;                   /* Cantos arredondados */
+  font-family: var(--font-body);        /* Fonte DM Sans */
+  font-size: 13px;                      /* Tamanho pequeno */
+  font-weight: 500;                     /* Peso médio */
+  cursor: pointer;                      /* Cursor indicando clicabilidade */
+  background: transparent;              /* Fundo transparente por padrão */
+  color: var(--text-sub);               /* Cinza azulado */
+  transition: all 0.2s;                 /* Transição suave */
+}
+
+/* Efeito ao passar o mouse */
+.tab-btn:hover { 
+  background: rgba(255,255,255,0.7);   /* Fundo branco suave */
+  color: var(--navy);                   /* Texto fica navy */
+}
+
+/* Aba ativa */
+.tab-btn.active {
+  background: #FFFFFF;                  /* Fundo branco puro */
+  color: var(--navy);                   /* Texto navy */
+  font-weight: 600;                     /* Mais bold */
+  box-shadow: 0 2px 8px rgba(26, 43, 107, 0.12); /* Sombra suave */
+}
+
+/* ── Contêineres de gráficos ────────────── */
+
+/* Wrapper para cada gráfico */
+.chart-wrapper {
+  background: var(--card-bg);           /* Fundo branco */
+  border-radius: var(--radius);         /* Cantos arredondados (16px) */
+  border: 1px solid var(--card-border); /* Borda suave */
+  padding: 24px 20px 16px;              /* Espaçamento (mais espaço no topo) */
+  box-shadow: var(--shadow);            /* Sombra padrão */
+}
+
+/* Título do gráfico */
+.chart-title {
+  font-family: var(--font-head);        /* Fonte Sora */
+  font-size: 13px;                      /* Texto pequeno */
+  font-weight: 600;                     /* Semi-bold */
+  color: var(--text-main);              /* Navy */
+  margin-bottom: 4px;                   /* Pequeno espaço abaixo */
+}
+
+/* Descrição/contexto do gráfico */
+.chart-desc {
+  font-size: 11.5px;                    /* Texto bem pequeno */
+  color: var(--text-sub);               /* Cinza azulado */
+  margin-bottom: 16px;                  /* Espaço abaixo para o gráfico */
+}
+
+/* ── Animações ─────────────────────────── */
+
+/* Animação fadeUp - fade in com movimento para cima */
+@keyframes fadeUp {
+  from { 
+    opacity: 0;                         /* Começa invisível */
+    transform: translateY(18px);        /* Começa 18px abaixo */
+  }
+  to   { 
+    opacity: 1;                         /* Termina visível */
+    transform: translateY(0);           /* Termina na posição normal */
+  }
+}
+
+/* Classe para aplicar animação fadeUp */
+.fade-up {
+  animation: fadeUp 0.38s ease forwards; /* Animação de 380ms */
+}
+
+/* Classes com delay para efeito escalonado (stagger) */
+.fade-up-1 { animation-delay: 0.05s; opacity: 0; } /* Primeiro elemento - delay 50ms */
+.fade-up-2 { animation-delay: 0.12s; opacity: 0; } /* Segundo elemento - delay 120ms */
+.fade-up-3 { animation-delay: 0.19s; opacity: 0; } /* Terceiro elemento - delay 190ms */
+.fade-up-4 { animation-delay: 0.26s; opacity: 0; } /* Quarto elemento - delay 260ms */
+.fade-up-5 { animation-delay: 0.33s; opacity: 0; } /* Quinto elemento - delay 330ms */
+
+/* ── Customização de scrollbar ──────────── */
+
+/* Largura da scrollbar em navegadores webkit (Chrome, Safari) */
+::-webkit-scrollbar { 
+  width: 6px;                           /* Scrollbar fina (6px) */
+}
+
+/* Fundo da scrollbar track */
+::-webkit-scrollbar-track { 
+  background: transparent;              /* Transparente (invisível por padrão) */
+}
+
+/* Estilo do thumb (parte que se move) */
+::-webkit-scrollbar-thumb { 
+  background: #C8CEEB;                  /* Cinza azulado */
+  border-radius: 99px;                  /* Cantos muito arredondados */
+}
+
+/* Estilo do thumb ao passar o mouse */
+::-webkit-scrollbar-thumb:hover { 
+  background: var(--accent);            /* Muda para azul (accent) */
+}
+
+/* ── Ajustes responsivos para telas pequenas ── */
+
+/* Aplica quando tela tem 900px ou menos de largura */
+@media (max-width: 900px) {
+  #sidebar { 
+    width: 64px;                        /* Sidebar se torna colapsada (apenas ícones) */
+  }
+  
+  .nav-item span { 
+    display: none;                      /* Esconde textos dos itens de navegação */
+  }
+  
+  /* Esconde elementos de texto não essenciais na sidebar colapsada */
+  .sidebar-logo-title, 
+  .sidebar-logo-sub, 
+  .nav-section-label, 
+  .sidebar-footer { 
+    display: none;                      /* Remove do fluxo de layout */
+  }
+  
+  #page-content { 
+    padding: 24px 20px;                 /* Reduz padding do conteúdo para telas pequenas */
+  }
+}
