@@ -140,7 +140,7 @@ def _load() -> pd.DataFrame:
         elif max_pct == pct_ind:
             return "Industrial"
         elif max_pct == pct_serv:
-            return "Serviços/Turismo"
+            return "Serviços Predominantes"
         else:
             return "Dependência Pública"
     
@@ -178,7 +178,7 @@ def _load() -> pd.DataFrame:
         pressao_norm = row["indice_pressao_turistica"] / 100
         
         # Score: quanto maior o potencial, melhor
-        # Alto potencial = bom desenvolvimento + baixa pressão turística
+        # Alto potencial = bom desenvolvimento + menor densidade hoteleira relativa
         score = ((idh_norm * 0.35 + infra_norm * 0.30 + moderniz_norm * 0.20) * (1 - pressao_norm * 0.15)) * 100
         return score
     
@@ -235,9 +235,9 @@ def _load() -> pd.DataFrame:
     idhm_p70      = df["IDHM"].quantile(0.70)
     mediana_leitos = df["leitos_1000hab"].median()
     df["quadrante"] = "Outros"
-    df.loc[(df["IDHM"] >= idhm_p70) & (df["leitos_1000hab"] <= mediana_leitos), "quadrante"] = "Joia Escondida"
-    df.loc[(df["IDHM"] >= idhm_p70) & (df["leitos_1000hab"] >  mediana_leitos), "quadrante"] = "Alto IDH + Estrutura"
-    df.loc[(df["IDHM"] <  idhm_p70) & (df["leitos_1000hab"] >  mediana_leitos), "quadrante"] = "Estrutura sem IDH"
+    df.loc[(df["IDHM"] >= idhm_p70) & (df["leitos_1000hab"] <= mediana_leitos), "quadrante"] = "Alto IDH + Baixa Estrutura"
+    df.loc[(df["IDHM"] >= idhm_p70) & (df["leitos_1000hab"] >  mediana_leitos), "quadrante"] = "Alto IDH + Alta Estrutura"
+    df.loc[(df["IDHM"] <  idhm_p70) & (df["leitos_1000hab"] >  mediana_leitos), "quadrante"] = "Alta Estrutura + Baixo IDH"
 
     return df
 
