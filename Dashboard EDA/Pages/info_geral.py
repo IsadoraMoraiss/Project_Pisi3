@@ -27,9 +27,9 @@ CONTEXTO = (
     "O projeto Brasil em Foco tem como propósito central investigar e visualizar "
     "indicadores socioeconômicos do território brasileiro, abrangendo múltiplas "
     "dimensões — desenvolvimento humano, mobilidade urbana, tecnologia, agronegócio "
-    "e turismo. A narrativa principal é identificar quais municípios combinam "
-    "qualidade de vida, infraestrutura turística e baixa pressão, quais já concentram "
-    "estrutura e quais fogem do padrão esperado."
+    "e turismo. A narrativa principal é analisar desigualdades de aproveitamento "
+    "turístico entre municípios brasileiros semelhantes, separando territórios "
+    "consolidados daqueles com bons fundamentos e estrutura ainda pouco convertida."
 )
 
 OBJETIVO_DISCIPLINA = (
@@ -46,9 +46,9 @@ OBJETIVO_DASHBOARD = (
 )
 
 JORNADA_ANALITICA = [
-    ("Visão Geral", "diagnosticar qualidade, infraestrutura, pressão turística e oportunidade do recorte selecionado."),
+    ("Visão Geral", "diagnosticar potencial, infraestrutura, densidade hoteleira e aproveitamento do recorte selecionado."),
     ("Univariada", "mostrar onde o recorte se posiciona nas distribuições nacionais e regionais."),
-    ("Bivariada", "investigar quais fatores caminham juntos na formação de estrutura e potencial turístico."),
+    ("Bivariada", "investigar quais fatores caminham juntos na formação de estrutura e aproveitamento turístico."),
     ("Outliers", "explicar quais municípios fogem do padrão e por que essas exceções importam."),
 ]
 

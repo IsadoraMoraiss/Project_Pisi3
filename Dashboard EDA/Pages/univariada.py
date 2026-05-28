@@ -123,10 +123,10 @@ def _build_uber_bar() -> go.Figure:
 
 def _build_quadrante_bar() -> go.Figure:
     QUAD_COLORS = {
-        "Joia Escondida":      STORY_COLORS["warning"],
-        "Alto IDH + Estrutura":STORY_COLORS["positive"],
-        "Estrutura sem IDH":   STORY_COLORS["accent"],
-        "Outros":              STORY_COLORS["context"],
+        "Alto IDH + Baixa Estrutura": STORY_COLORS["warning"],
+        "Alto IDH + Alta Estrutura":  STORY_COLORS["positive"],
+        "Alta Estrutura + Baixo IDH": STORY_COLORS["accent"],
+        "Outros":                     STORY_COLORS["context"],
     }
     grp = DF["quadrante"].value_counts()
     fig = go.Figure(go.Bar(
@@ -135,7 +135,7 @@ def _build_quadrante_bar() -> go.Figure:
         marker_color=[QUAD_COLORS.get(q, "#AAB") for q in grp.index],
         opacity=0.9, text=grp.values, textposition="outside",
     ))
-    fig.update_layout(xaxis_title="Perfil Turístico", yaxis_title="Nº Municípios")
+    fig.update_layout(xaxis_title="Perfil de aproveitamento", yaxis_title="Nº Municípios")
     return apply_default_layout(fig)
 
 
@@ -260,12 +260,12 @@ layout = html.Div(
         html.Div(
             className="dash-card fade-up fade-up-5",
             children=[
-                html.Div("Perfil Turístico dos Municípios (Quadrantes)", className="section-title"),
+                html.Div("Aproveitamento Turístico dos Municípios (Quadrantes)", className="section-title"),
                 html.Hr(className="divider"),
                 create_chart_card(
                     "uni-quadrante", _build_quadrante_bar(),
                     description="Classificação baseada em IDHM e leitos/1000hab — "
-                                "\"Joia Escondida\" = alto IDH com baixa estrutura hoteleira",
+                                "\"Alto IDH + Baixa Estrutura\" = potencial ainda pouco convertido em hospedagem",
                     height=300,
                 ),
             ],
