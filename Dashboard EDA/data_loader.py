@@ -25,7 +25,7 @@ STATE_TO_REGION = {
 }
 
 REGIOES   = ["Norte", "Nordeste", "Centro-Oeste", "Sudeste", "Sul"]
-PALETTE   = ["#4A6CF7", "#1ABC9C", "#F5A623", "#E74C3C", "#27AE60"]
+PALETTE   = ["#4E79A7", "#59A14F", "#F28E2B", "#E15759", "#B07AA1"]
 REG_COLOR = dict(zip(REGIOES, PALETTE))
 
 

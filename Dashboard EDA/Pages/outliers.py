@@ -8,11 +8,15 @@ import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
 
-from components.chart_card import create_chart_card, apply_default_layout, PLOTLY_CONFIG
-from components.metric_tile import create_metric_tile
+from Components.chart_card import create_chart_card, apply_default_layout, PLOTLY_CONFIG, STORY_COLORS
+from Components.metric_tile import create_metric_tile
 from data_loader import DF, ALL_REGIONS, REG_COLOR
 
-PALETTE = {"outlier": "#E74C3C", "normal": "#4A6CF7", "border": "#1A2B6B"}
+PALETTE = {
+    "outlier": STORY_COLORS["accent"],
+    "normal": STORY_COLORS["context"],
+    "border": STORY_COLORS["text"],
+}
 
 # ─── Variáveis para análise de outliers ──────────────────────────────────
 OUTLIER_VARS = [
@@ -42,9 +46,9 @@ def _build_boxmulti() -> go.Figure:
     fig = go.Figure()
     # IDHM, leitos_1000hab, pct_agro_gva — normalizado para mesma escala
     specs = [
-        ("IDHM",          "IDHM ×100",     lambda v: v * 100,   "#4A6CF7"),
-        ("pct_agro_gva",  "% Agro GVA",   lambda v: v,          "#27AE60"),
-        ("leitos_1000hab","Leitos/1k hab", lambda v: v,          "#F5A623"),
+        ("IDHM",          "IDHM ×100",     lambda v: v * 100,   STORY_COLORS["accent_blue"]),
+        ("pct_agro_gva",  "% Agro GVA",   lambda v: v,          STORY_COLORS["positive"]),
+        ("leitos_1000hab","Leitos/1k hab", lambda v: v,          STORY_COLORS["warning"]),
     ]
     for col, name, fn, color in specs:
         vals = DF[col].dropna()
@@ -96,8 +100,8 @@ def _build_scatter_z(col_x: str, col_y: str) -> go.Figure:
         customdata=sub.loc[is_out, "CITY"].values,
     ))
     fig.add_shape(type="rect", x0=-2, x1=2, y0=-2, y1=2,
-                  line=dict(color="#E74C3C", width=1.5, dash="dot"),
-                  fillcolor="rgba(231,76,60,0.04)")
+                  line=dict(color=STORY_COLORS["accent"], width=1.5, dash="dot"),
+                  fillcolor="rgba(209,73,91,0.05)")
     fig.update_layout(
         xaxis_title=f"Z-score — {VAR_LABELS.get(col_x, col_x)}",
         yaxis_title=f"Z-score — {VAR_LABELS.get(col_y, col_y)}",
@@ -111,10 +115,10 @@ def _build_hist_z(col: str) -> go.Figure:
     cap  = 4.5
     z    = z.clip(-cap, cap)
     fig  = go.Figure(go.Histogram(
-        x=z, nbinsx=40, marker_color="#4A6CF7", opacity=0.8, name="Z-score",
+        x=z, nbinsx=40, marker_color=STORY_COLORS["context"], opacity=0.8, name="Z-score",
     ))
-    fig.add_vline(x=2,  line_dash="dot", line_color="#E74C3C", line_width=2)
-    fig.add_vline(x=-2, line_dash="dot", line_color="#E74C3C", line_width=2)
+    fig.add_vline(x=2,  line_dash="dot", line_color=STORY_COLORS["accent"], line_width=2)
+    fig.add_vline(x=-2, line_dash="dot", line_color=STORY_COLORS["accent"], line_width=2)
     n_out = int((np.abs(z) > 2).sum())
     fig.update_layout(
         xaxis_title=f"Z-score — {VAR_LABELS.get(col, col)}",
