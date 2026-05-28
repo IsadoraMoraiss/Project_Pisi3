@@ -155,7 +155,7 @@ layout = html.Div(
             children=[
                 html.Div("⚠️  Outliers", className="page-title fade-up fade-up-1"),
                 html.Div(
-                    "Detecção e caracterização de valores atípicos — 5.573 municípios reais",
+                    "Quais municípios fogem do padrão e que exceções merecem investigação",
                     className="page-subtitle fade-up fade-up-1",
                 ),
             ],

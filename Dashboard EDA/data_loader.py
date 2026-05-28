@@ -61,8 +61,11 @@ def _load() -> pd.DataFrame:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
     # Nessas colunas, nulo representa ausencia no cadastro, nao valor desconhecido.
-    # Usar mediana aqui inflava artificialmente cobertura Uber, hoteis e leitos.
-    zero_fill_cols = ["UBER", "HOTELS", "BEDS"]
+    # Usar mediana aqui inflava artificialmente servicos e infraestrutura.
+    zero_fill_cols = [
+        "UBER", "HOTELS", "BEDS",
+        "MAC", "WAL-MART", "Pr_Agencies", "Pu_Agencies",
+    ]
     for col in zero_fill_cols:
         if col in df.columns:
             df[col] = df[col].fillna(0)

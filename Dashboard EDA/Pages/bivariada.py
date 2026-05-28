@@ -169,7 +169,7 @@ layout = html.Div(
             children=[
                 html.Div("🔗  Análise Bi/Multivariada", className="page-title fade-up fade-up-1"),
                 html.Div(
-                    "Correlações e relações entre variáveis — dados reais dos 5.573 municípios",
+                    "Quais fatores caminham juntos na formação de estrutura e potencial turístico",
                     className="page-subtitle fade-up fade-up-1",
                 ),
             ],

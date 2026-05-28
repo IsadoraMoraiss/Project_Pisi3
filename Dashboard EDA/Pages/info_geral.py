@@ -16,7 +16,7 @@ TEAM_MEMBERS = [
 ]
 
 PROJECT_INFO = {
-    "Curso":       "Siatemas de Informação",
+    "Curso":       "Sistemas de Informação",
     "Disciplina":  "Projeto Interdisciplinar para Sistemas de Informação III",
     "Período":     "2026.1",
     "Professor":   "Gabriel Alves",
@@ -27,9 +27,9 @@ CONTEXTO = (
     "O projeto Brasil em Foco tem como propósito central investigar e visualizar "
     "indicadores socioeconômicos do território brasileiro, abrangendo múltiplas "
     "dimensões — desenvolvimento humano, mobilidade urbana, tecnologia, agronegócio "
-    "e turismo. A partir de dados públicos oficiais, buscamos revelar padrões, "
-    "disparidades regionais e tendências que possam subsidiar análises críticas "
-    "sobre a realidade brasileira."
+    "e turismo. A narrativa principal é identificar quais municípios combinam "
+    "qualidade de vida, infraestrutura turística e baixa pressão, quais já concentram "
+    "estrutura e quais fogem do padrão esperado."
 )
 
 OBJETIVO_DISCIPLINA = (
@@ -39,11 +39,18 @@ OBJETIVO_DISCIPLINA = (
 )
 
 OBJETIVO_DASHBOARD = (
-    "Este dashboard tem como objetivo explorar e visualizar os principais aspectos "
-    "dos dados analisados, oferecendo insights iniciais sobre distribuições, "
-    "correlações e outliers presentes no dataset Brasil em Foco, auxiliando na "
-    "compreensão da realidade socioeconômica brasileira de forma interativa e acessível."
+    "Este dashboard foi organizado como uma jornada de análise: primeiro diagnostica "
+    "o recorte escolhido, depois mostra onde ele se posiciona nas distribuições, "
+    "investiga quais fatores caminham juntos e, por fim, destaca municípios que "
+    "fogem do padrão e merecem explicação."
 )
+
+JORNADA_ANALITICA = [
+    ("Visão Geral", "diagnosticar qualidade, infraestrutura, pressão turística e oportunidade do recorte selecionado."),
+    ("Univariada", "mostrar onde o recorte se posiciona nas distribuições nacionais e regionais."),
+    ("Bivariada", "investigar quais fatores caminham juntos na formação de estrutura e potencial turístico."),
+    ("Outliers", "explicar quais municípios fogem do padrão e por que essas exceções importam."),
+]
 
 # ─── Layout ────────────────────────────────────────────────────────────────
 
@@ -125,6 +132,23 @@ layout = html.Div(
             "🗺️  Contexto Geral do Projeto",
             [html.P(CONTEXTO, className="info-value", style={"lineHeight": "1.75"})],
             anim="fade-up fade-up-3",
+        ),
+
+        _section(
+            "🧭  Jornada Analítica",
+            [
+                html.Ol(
+                    className="bullet-list",
+                    children=[
+                        html.Li([
+                            html.Strong(f"{titulo}: "),
+                            html.Span(descricao),
+                        ])
+                        for titulo, descricao in JORNADA_ANALITICA
+                    ],
+                )
+            ],
+            anim="fade-up fade-up-4",
         ),
 
         # ── Grid 2 colunas (objetivos) ──

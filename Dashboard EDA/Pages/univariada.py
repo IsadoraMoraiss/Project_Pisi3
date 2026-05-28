@@ -101,13 +101,23 @@ def _build_bar_regioes_col(col: str) -> go.Figure:
 
 
 def _build_uber_bar() -> go.Figure:
-    grp = DF.groupby("REGIAO")["UBER"].sum().reindex(ALL_REGIONS)
+    grouped = DF.assign(tem_uber=DF["UBER"] > 0).groupby("REGIAO")["tem_uber"]
+    qtd = grouped.sum().reindex(ALL_REGIONS)
+    total = grouped.count().reindex(ALL_REGIONS)
+    pct = (qtd / total * 100).fillna(0)
     fig = go.Figure(go.Bar(
-        x=grp.index.tolist(), y=grp.values,
+        x=pct.index.tolist(), y=pct.values,
         marker_color=list(REG_COLOR.values()), opacity=0.9,
-        text=grp.astype(int).values, textposition="outside",
+        text=[f"{v:.1f}%" for v in pct.values], textposition="outside",
+        customdata=np.column_stack([qtd.astype(int).values, total.astype(int).values]),
+        hovertemplate=(
+            "%{x}<br>"
+            "Cobertura: %{y:.1f}%<br>"
+            "Municípios com Uber: %{customdata[0]} de %{customdata[1]}"
+            "<extra></extra>"
+        ),
     ))
-    fig.update_layout(xaxis_title="Região", yaxis_title="Cidades com Uber")
+    fig.update_layout(xaxis_title="Região", yaxis_title="% de municípios com Uber")
     return apply_default_layout(fig)
 
 
@@ -138,7 +148,7 @@ layout = html.Div(
             children=[
                 html.Div("📊  Análise Univariada", className="page-title fade-up fade-up-1"),
                 html.Div(
-                    "Distribuição individual de cada variável — dados reais dos 5.573 municípios",
+                    "Onde os municípios se posicionam nas distribuições nacionais e regionais",
                     className="page-subtitle fade-up fade-up-1",
                 ),
             ],
@@ -239,7 +249,7 @@ layout = html.Div(
                         html.Div("Cobertura Uber por Região", className="section-title"),
                         html.Hr(className="divider"),
                         create_chart_card("uni-uber-bar", _build_uber_bar(),
-                                          description="Municípios com Uber disponível por macrorregião",
+                                          description="Percentual de municípios com Uber disponível por macrorregião",
                                           height=300),
                     ],
                 ),
