@@ -5,7 +5,7 @@ Integrada com dataset real BRAZIL_CITIES.csv via data_loader.
 """
 
 from dash import html, dcc, Input, Output, callback, ctx
-from components.metric_tile import create_metric_tile
+from Components.metric_tile import create_metric_tile
 from data_loader import (
     ALL_REGIONS, ALL_STATES, ALL_CITIES,
     region_summary, state_summary, city_summary,

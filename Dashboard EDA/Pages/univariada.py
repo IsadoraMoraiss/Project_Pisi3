@@ -9,10 +9,17 @@ import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
 
-from components.chart_card import create_chart_card, apply_default_layout, PLOTLY_CONFIG
+from Components.chart_card import create_chart_card, apply_default_layout, PLOTLY_CONFIG, STORY_COLORS
 from data_loader import DF, ALL_REGIONS, REG_COLOR
 
-PALETTE = ["#4A6CF7", "#1ABC9C", "#F5A623", "#E74C3C", "#27AE60", "#1A2B6B"]
+PALETTE = [
+    STORY_COLORS["accent_blue"],
+    STORY_COLORS["positive"],
+    STORY_COLORS["warning"],
+    STORY_COLORS["accent"],
+    STORY_COLORS["context"],
+    STORY_COLORS["text"],
+]
 
 # ─── Variáveis disponíveis para o seletor dinâmico ─────────────────────────
 VAR_OPTIONS = [
@@ -59,9 +66,9 @@ def _build_hist_variable(col: str, region: str) -> go.Figure:
     fig = _hist(vals, VAR_LABELS[col], PALETTE[0], VAR_LABELS[col])
     # Add median line
     med = vals.median()
-    fig.add_vline(x=med, line_dash="dot", line_color="#E74C3C", line_width=2,
+    fig.add_vline(x=med, line_dash="dot", line_color=STORY_COLORS["accent"], line_width=2,
                   annotation_text=f"Mediana: {med:,.1f}", annotation_position="top right",
-                  annotation_font_size=11, annotation_font_color="#E74C3C")
+                  annotation_font_size=11, annotation_font_color=STORY_COLORS["accent"])
     return fig
 
 
@@ -106,10 +113,10 @@ def _build_uber_bar() -> go.Figure:
 
 def _build_quadrante_bar() -> go.Figure:
     QUAD_COLORS = {
-        "Joia Escondida":      "#F7D154",
-        "Alto IDH + Estrutura":"#56C596",
-        "Estrutura sem IDH":   "#F7934C",
-        "Outros":              "#AABBD6",
+        "Joia Escondida":      STORY_COLORS["warning"],
+        "Alto IDH + Estrutura":STORY_COLORS["positive"],
+        "Estrutura sem IDH":   STORY_COLORS["accent"],
+        "Outros":              STORY_COLORS["context"],
     }
     grp = DF["quadrante"].value_counts()
     fig = go.Figure(go.Bar(

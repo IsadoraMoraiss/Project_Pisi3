@@ -9,7 +9,7 @@ import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 
-from components.chart_card import create_chart_card, apply_default_layout, PLOTLY_CONFIG
+from Components.chart_card import create_chart_card, apply_default_layout, PLOTLY_CONFIG, STORY_COLORS
 from data_loader import DF, ALL_REGIONS, REG_COLOR
 
 PALETTE = list(REG_COLOR.values())
@@ -83,7 +83,7 @@ def _build_scatter(x_col: str, y_col: str, size_col: str | None = None) -> go.Fi
         x_line = np.linspace(xs_all[mask_valid].min(), xs_all[mask_valid].max(), 100)
         fig.add_trace(go.Scatter(
             x=x_line, y=m * x_line + b, mode="lines", name="Tendência",
-            line=dict(color="#E74C3C", width=1.5, dash="dot"), showlegend=False,
+            line=dict(color=STORY_COLORS["accent"], width=1.5, dash="dot"), showlegend=False,
         ))
 
     fig.update_layout(
@@ -101,7 +101,12 @@ def _build_heatmap() -> go.Figure:
     corr.columns = labels
     fig = go.Figure(go.Heatmap(
         z=corr.values, x=labels, y=labels,
-        colorscale="Blues", zmin=-1, zmax=1,
+        colorscale=[
+            [0.0, "#B45F5F"],
+            [0.5, "#F4F5F7"],
+            [1.0, STORY_COLORS["accent_blue"]],
+        ],
+        zmin=-1, zmax=1,
         text=corr.values, texttemplate="%{text:.2f}",
         showscale=True,
     ))
