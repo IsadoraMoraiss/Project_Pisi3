@@ -388,7 +388,7 @@ layout = html.Div(
         html.Div(
             style={"marginBottom": "28px"},
             children=[
-                html.Div("🌎  Visão Geral", className="page-title fade-up fade-up-1"),
+                html.Div("Visão Geral", className="page-title fade-up fade-up-1"),
                 html.Div(
                     "Diagnóstico do recorte selecionado: qualidade, infraestrutura, pressão turística e oportunidade",
                     className="page-subtitle fade-up fade-up-1",
