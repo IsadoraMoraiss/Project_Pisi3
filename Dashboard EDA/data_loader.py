@@ -273,6 +273,7 @@ def region_summary(region: str) -> dict:
     rank_tech = int(DF.groupby("REGIAO")["COMP_J"].sum().rank(ascending=False, method="min").astype(int)[region])
     rank_agro = int(DF.groupby("REGIAO")["GVA_AGROPEC"].sum().rank(ascending=False, method="min").astype(int)[region])
     rank_hotel= int(DF.groupby("REGIAO")["HOTELS"].sum().rank(ascending=False, method="min").astype(int)[region])
+    rank_beds = int(DF.groupby("REGIAO")["BEDS"].sum().rank(ascending=False, method="min").astype(int)[region])
     rank_uber = int(DF.groupby("REGIAO")["UBER"].sum().rank(ascending=False, method="min").astype(int)[region])
     rank_pop  = int(DF.groupby("REGIAO")["ESTIMATED_POP"].sum().rank(ascending=False, method="min").astype(int)[region])
     
@@ -290,6 +291,7 @@ def region_summary(region: str) -> dict:
         "tech":       f"{int(sub['COMP_J'].sum()):,}".replace(",", "."),
         "agro":       f"R$ {sub['GVA_AGROPEC'].sum()/1e9:.1f} bi",
         "hoteis":     str(int(sub["HOTELS"].sum())),
+        "leitos":      f"{int(sub['BEDS'].sum()):,}".replace(",", "."),
         "uber":       str(int(sub["UBER"].sum())),
         "pop":        f"{sub['ESTIMATED_POP'].sum()/1e6:.1f} mi",
         "municipios": str(n),
@@ -298,6 +300,7 @@ def region_summary(region: str) -> dict:
         "rank_tech":  rank_tech,
         "rank_agro":  rank_agro,
         "rank_hotel": rank_hotel,
+        "rank_leitos": rank_beds,
         "rank_uber":  rank_uber,
         "rank_pop":   rank_pop,
         
@@ -329,6 +332,8 @@ def state_summary(state: str) -> dict:
     rank_agro = int(all_states_agro.rank(ascending=False, method="min").astype(int)[state])
     all_states_hotel = DF.groupby("STATE")["HOTELS"].sum()
     rank_hotel= int(all_states_hotel.rank(ascending=False, method="min").astype(int)[state])
+    all_states_beds = DF.groupby("STATE")["BEDS"].sum()
+    rank_beds = int(all_states_beds.rank(ascending=False, method="min").astype(int)[state])
     all_states_uber = DF.groupby("STATE")["UBER"].sum()
     rank_uber = int(all_states_uber.rank(ascending=False, method="min").astype(int)[state])
     all_states_pop = DF.groupby("STATE")["ESTIMATED_POP"].sum()
@@ -349,6 +354,7 @@ def state_summary(state: str) -> dict:
         "tech":       f"{int(sub['COMP_J'].sum()):,}".replace(",", "."),
         "agro":       f"R$ {sub['GVA_AGROPEC'].sum()/1e9:.1f} bi",
         "hoteis":     str(int(sub["HOTELS"].sum())),
+        "leitos":      f"{int(sub['BEDS'].sum()):,}".replace(",", "."),
         "uber":       str(int(sub["UBER"].sum())),
         "pop":        f"{sub['ESTIMATED_POP'].sum()/1e6:.2f} mi",
         "municipios": str(len(sub)),
@@ -356,6 +362,7 @@ def state_summary(state: str) -> dict:
         "rank_tech":  rank_tech,
         "rank_agro":  rank_agro,
         "rank_hotel": rank_hotel,
+        "rank_leitos": rank_beds,
         "rank_uber":  rank_uber,
         "rank_pop":   rank_pop,
         "n_states":   n_states,
@@ -393,6 +400,7 @@ def city_summary(city: str) -> dict:
     rank_idh = _rank_city_col("IDHM")
     rank_tech = _rank_city_col("COMP_J")
     rank_hotel = _rank_city_col("HOTELS")
+    rank_beds = _rank_city_col("BEDS")
     rank_uber = _rank_city_col("UBER")
     rank_pop = _rank_city_col("ESTIMATED_POP")
     rank_agro = _rank_city_col("GVA_AGROPEC")
@@ -409,6 +417,7 @@ def city_summary(city: str) -> dict:
         "tech":       str(int(row["COMP_J"])),
         "agro":       f"R$ {row['GVA_AGROPEC']/1e6:.1f} mi",
         "hoteis":     str(int(row["HOTELS"])),
+        "leitos":      f"{int(row['BEDS']):,}".replace(",", "."),
         "uber":       "Sim" if row["UBER"] >= 1 else "Não",
         "pop":        f"{int(row['ESTIMATED_POP']):,}".replace(",", "."),
         "state":      str(row["STATE"]),
@@ -417,6 +426,7 @@ def city_summary(city: str) -> dict:
         "rank_idh":   rank_idh,
         "rank_tech":  rank_tech,
         "rank_hotel": rank_hotel,
+        "rank_leitos": rank_beds,
         "rank_uber":  rank_uber,
         "rank_pop":   rank_pop,
         "rank_agro":  rank_agro,
