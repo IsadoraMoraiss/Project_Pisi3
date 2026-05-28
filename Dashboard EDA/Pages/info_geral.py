@@ -86,7 +86,7 @@ layout = html.Div(
             style={"marginBottom": "32px"},
             children=[
                 html.Div(
-                    "👋  Bem-vindo ao Dashboard",
+                    "Bem-vindo ao Dashboard",
                     className="page-title fade-up fade-up-1",
                 ),
                 html.Div(
@@ -108,7 +108,7 @@ layout = html.Div(
 
                 # Card: Equipe
                 _section(
-                    "👥  Integrantes da Equipe",
+                    "Integrantes da Equipe",
                     [
                         html.Ul(
                             className="bullet-list",
@@ -120,7 +120,7 @@ layout = html.Div(
 
                 # Card: Dados do projeto
                 _section(
-                    "📋  Dados do Projeto",
+                    "Dados do Projeto",
                     [_info_row(k, v) for k, v in PROJECT_INFO.items()],
                     anim="fade-up fade-up-3",
                 ),
@@ -129,13 +129,13 @@ layout = html.Div(
 
         # ── Contexto ──
         _section(
-            "🗺️  Contexto Geral do Projeto",
+            "Contexto Geral do Projeto",
             [html.P(CONTEXTO, className="info-value", style={"lineHeight": "1.75"})],
             anim="fade-up fade-up-3",
         ),
 
         _section(
-            "🧭  Jornada Analítica",
+            "Jornada Analítica",
             [
                 html.Ol(
                     className="bullet-list",
@@ -160,12 +160,12 @@ layout = html.Div(
             },
             children=[
                 _section(
-                    "🎓  Objetivo da Disciplina",
+                    "Objetivo da Disciplina",
                     [html.P(OBJETIVO_DISCIPLINA, className="info-value", style={"lineHeight": "1.75"})],
                     anim="fade-up fade-up-4",
                 ),
                 _section(
-                    "📊  Objetivo do Dashboard",
+                    "Objetivo do Dashboard",
                     [html.P(OBJETIVO_DASHBOARD, className="info-value", style={"lineHeight": "1.75"})],
                     anim="fade-up fade-up-5",
                 ),
