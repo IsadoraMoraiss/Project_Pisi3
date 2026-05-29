@@ -46,7 +46,7 @@ OBJETIVO_DASHBOARD = (
 )
 
 JORNADA_ANALITICA = [
-    ("Visão Geral", "diagnosticar potencial, infraestrutura, densidade hoteleira e aproveitamento do recorte selecionado."),
+    ("Visão Geral", "diagnosticar potencial, infraestrutura, oferta hoteleira e aproveitamento do recorte selecionado."),
     ("Univariada", "mostrar onde o recorte se posiciona nas distribuições nacionais e regionais."),
     ("Bivariada", "investigar quais fatores caminham juntos na formação de estrutura e aproveitamento turístico."),
     ("Outliers", "explicar quais municípios fogem do padrão e por que essas exceções importam."),
