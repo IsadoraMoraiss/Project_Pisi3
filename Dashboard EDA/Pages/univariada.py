@@ -6,7 +6,6 @@ com filtros dinâmicos por região e variável.
 
 from dash import html, dcc, Input, Output, callback, ctx
 import plotly.graph_objects as go
-import numpy as np
 import pandas as pd
 
 from Components.chart_card import create_chart_card, apply_default_layout, PLOTLY_CONFIG, STORY_COLORS
@@ -23,19 +22,38 @@ PALETTE = [
 
 # ─── Variáveis disponíveis para o seletor dinâmico ─────────────────────────
 VAR_OPTIONS = [
-    {"label": "IDHM",                   "value": "IDHM"},
-    {"label": "PIB per capita (R$)",     "value": "GDP_CAPITA"},
-    {"label": "População Estimada",      "value": "ESTIMATED_POP"},
-    {"label": "Hotéis",                  "value": "HOTELS"},
+    {"label": "IDHM",                      "value": "IDHM"},
     {"label": "Oferta Hoteleira Observada", "value": "indice_oferta_hoteleira_observada"},
-    {"label": "Empresas de Tech",        "value": "COMP_J"},
-    {"label": "PIB Agropecuário (R$)",   "value": "GVA_AGROPEC"},
-    {"label": "Serviços Alojamento",     "value": "COMP_I"},
-    {"label": "Veículos (Carros)",       "value": "Cars"},
-    {"label": "Motocicletas",            "value": "Motorcycles"},
+    {"label": "Infraestrutura Turística",  "value": "indice_infraestrutura"},
+    {"label": "Potencial Não Convertido",  "value": "potencial_joia_escondida"},
+    {"label": "Conversão Turística Proxy", "value": "indice_conversao_turistica_proxy"},
+    {"label": "Conveniência Urbana",       "value": "indice_modernizacao"},
+    {"label": "Autonomia Turística",       "value": "indice_acessibilidade"},
+    {"label": "Hotéis",                    "value": "HOTELS"},
+    {"label": "Leitos",                    "value": "BEDS"},
+    {"label": "População Estimada",        "value": "ESTIMATED_POP"},
+    {"label": "PIB per capita (R$)",       "value": "GDP_CAPITA"},
+    {"label": "Empresas de Tecnologia",    "value": "COMP_J"},
+    {"label": "Serviços de Alojamento",    "value": "COMP_I"},
 ]
 
 VAR_LABELS = {o["value"]: o["label"] for o in VAR_OPTIONS}
+
+VAR_EXPLANATIONS = {
+    "IDHM": "Usado como base social: valores altos indicam melhores condições humanas, mas não garantem turismo convertido.",
+    "indice_oferta_hoteleira_observada": "Mede a posição do município em hotéis e leitos absolutos, sem penalizar cidades populosas.",
+    "indice_infraestrutura": "Resume estrutura operacional de apoio ao turista: hospedagem, agências, bancos e mobilidade por app.",
+    "potencial_joia_escondida": "Mostra o gap proxy entre potencial estimado e estrutura observada; alto valor sugere subaproveitamento.",
+    "indice_conversao_turistica_proxy": "Representa estrutura turística já convertida em oferta observável no dataset.",
+    "indice_modernizacao": "Indica conveniência urbana e digital, com sinais de mobilidade, tecnologia, telefonia e bancos.",
+    "indice_acessibilidade": "Avalia autonomia do visitante por serviços, comunicação, bancos e mobilidade cadastrada.",
+    "HOTELS": "Conta meios de hospedagem cadastrados; valores zerados podem indicar ausência de registro no dataset.",
+    "BEDS": "Conta leitos cadastrados e ajuda a dimensionar capacidade real de hospedagem.",
+    "ESTIMATED_POP": "Contextualiza escala urbana; não deve ser lida como demanda turística.",
+    "GDP_CAPITA": "Ajuda a comparar capacidade econômica do município, sem medir turismo diretamente.",
+    "COMP_J": "Conta empresas de tecnologia, usadas como sinal de base digital e serviços modernos.",
+    "COMP_I": "Conta empresas de alojamento e alimentação, aproximação setorial ligada à experiência do visitante.",
+}
 
 REGIOES_ALL = ["Todas"] + ALL_REGIONS
 
@@ -46,6 +64,27 @@ def _filter_df(region: str) -> pd.DataFrame:
     if region == "Todas":
         return DF.copy()
     return DF[DF["REGIAO"] == region].copy()
+
+
+def _var_explanation(col: str) -> str:
+    return VAR_EXPLANATIONS.get(col, "Ajuda a posicionar o município dentro da distribuição observada no dataset.")
+
+
+def _hist_description(col: str, region: str) -> str:
+    scope = "Brasil" if region == "Todas" else region
+    return (
+        f"Mostra a distribuição de {VAR_LABELS.get(col, col)} em {scope}. "
+        f"A linha pontilhada marca a mediana; concentração à esquerda indica muitos municípios com valores baixos. "
+        f"{_var_explanation(col)}"
+    )
+
+
+def _box_description(col: str) -> str:
+    return (
+        f"Compara a dispersão regional de {VAR_LABELS.get(col, col)}. "
+        "Caixas mais altas ou assimétricas indicam maior desigualdade interna entre municípios. "
+        f"{_var_explanation(col)}"
+    )
 
 
 def _hist(values, name, color, xlabel, nbins=30):
@@ -86,41 +125,6 @@ def _build_boxplot_regions(col: str) -> go.Figure:
     return apply_default_layout(fig)
 
 
-def _build_bar_regioes_col(col: str) -> go.Figure:
-    grp = DF.groupby("REGIAO")[col].mean().reindex(ALL_REGIONS)
-    fig = go.Figure(go.Bar(
-        x=grp.index.tolist(),
-        y=grp.values,
-        marker_color=list(REG_COLOR.values()),
-        opacity=0.9,
-        text=grp.round(2).values,
-        textposition="outside",
-    ))
-    fig.update_layout(xaxis_title="Região", yaxis_title=f"Média — {VAR_LABELS.get(col,col)}")
-    return apply_default_layout(fig)
-
-
-def _build_uber_bar() -> go.Figure:
-    grouped = DF.assign(tem_uber=DF["UBER"] > 0).groupby("REGIAO")["tem_uber"]
-    qtd = grouped.sum().reindex(ALL_REGIONS)
-    total = grouped.count().reindex(ALL_REGIONS)
-    pct = (qtd / total * 100).fillna(0)
-    fig = go.Figure(go.Bar(
-        x=pct.index.tolist(), y=pct.values,
-        marker_color=list(REG_COLOR.values()), opacity=0.9,
-        text=[f"{v:.1f}%" for v in pct.values], textposition="outside",
-        customdata=np.column_stack([qtd.astype(int).values, total.astype(int).values]),
-        hovertemplate=(
-            "%{x}<br>"
-            "Cobertura: %{y:.1f}%<br>"
-            "Municípios com Uber: %{customdata[0]} de %{customdata[1]}"
-            "<extra></extra>"
-        ),
-    ))
-    fig.update_layout(xaxis_title="Região", yaxis_title="% de municípios com Uber")
-    return apply_default_layout(fig)
-
-
 def _build_quadrante_bar() -> go.Figure:
     QUAD_COLORS = {
         "Alto IDH + Estrutura Limitada":       STORY_COLORS["warning"],
@@ -133,9 +137,19 @@ def _build_quadrante_bar() -> go.Figure:
         x=grp.index.tolist(),
         y=grp.values,
         marker_color=[QUAD_COLORS.get(q, "#AAB") for q in grp.index],
-        opacity=0.9, text=grp.values, textposition="outside",
+        opacity=0.9,
+        text=grp.values,
+        textposition="outside",
+        textfont=dict(color=STORY_COLORS["text"], size=12),
+        cliponaxis=False,
     ))
-    fig.update_layout(xaxis_title="Perfil de aproveitamento", yaxis_title="Nº Municípios")
+    ymax = max(grp.max() * 1.18, 1)
+    fig.update_layout(
+        xaxis_title="Perfil de aproveitamento",
+        yaxis_title="Nº Municípios",
+        yaxis=dict(range=[0, ymax]),
+        margin=dict(t=30),
+    )
     return apply_default_layout(fig)
 
 
@@ -146,9 +160,9 @@ layout = html.Div(
         html.Div(
             style={"marginBottom": "28px"},
             children=[
-                html.Div("📊  Análise Univariada", className="page-title fade-up fade-up-1"),
+                html.Div("Análise Univariada", className="page-title fade-up fade-up-1"),
                 html.Div(
-                    "Onde os municípios se posicionam nas distribuições nacionais e regionais",
+                    "Onde os municípios se posicionam nas distribuições de potencial, estrutura e conversão turística proxy",
                     className="page-subtitle fade-up fade-up-1",
                 ),
             ],
@@ -159,7 +173,7 @@ layout = html.Div(
             className="dash-card fade-up fade-up-2",
             style={"marginBottom": "20px"},
             children=[
-                html.Div("Histograma por Variável e Região", className="section-title"),
+                html.Div("Distribuição da variável selecionada", className="section-title"),
                 html.Hr(className="divider"),
 
                 # Controles
@@ -190,6 +204,7 @@ layout = html.Div(
                         ]),
                     ],
                 ),
+                html.Div(id="uni-hist-desc", className="chart-desc", style={"marginBottom": "10px"}),
                 dcc.Graph(id="uni-hist-dynamic", config=PLOTLY_CONFIG, style={"height": "320px"}),
             ],
         ),
@@ -199,7 +214,7 @@ layout = html.Div(
             className="dash-card fade-up fade-up-3",
             style={"marginBottom": "20px"},
             children=[
-                html.Div("Box-Plot Comparativo por Região", className="section-title"),
+                html.Div("Comparação regional da distribuição", className="section-title"),
                 html.Hr(className="divider"),
                 html.Div(
                     style={"marginBottom": "12px"},
@@ -215,57 +230,20 @@ layout = html.Div(
                         ),
                     ],
                 ),
+                html.Div(id="uni-box-desc", className="chart-desc", style={"marginBottom": "10px"}),
                 dcc.Graph(id="uni-box-dynamic", config=PLOTLY_CONFIG, style={"height": "340px"}),
             ],
         ),
 
-        # ── Seção 3: Gráficos fixos informativos ──────────────────────
-        html.Div(
-            style={"display": "grid", "gridTemplateColumns": "1fr 1fr", "gap": "20px", "marginBottom": "20px"},
-            children=[
-                html.Div(
-                    className="dash-card fade-up fade-up-4",
-                    children=[
-                        html.Div("Média por Região — Variável Selecionável", className="section-title"),
-                        html.Hr(className="divider"),
-                        html.Div(
-                            style={"marginBottom": "10px"},
-                            children=[
-                                dcc.Dropdown(
-                                    id="uni-dd-bar-reg",
-                                    options=VAR_OPTIONS,
-                                    value="IDHM",
-                                    clearable=False,
-                                    style={"fontFamily": "DM Sans, sans-serif"},
-                                ),
-                            ],
-                        ),
-                        dcc.Graph(id="uni-bar-reg", config=PLOTLY_CONFIG, style={"height": "300px"}),
-                    ],
-                ),
-                html.Div(
-                    className="dash-card fade-up fade-up-5",
-                    children=[
-                        html.Div("Cobertura Uber por Região", className="section-title"),
-                        html.Hr(className="divider"),
-                        create_chart_card("uni-uber-bar", _build_uber_bar(),
-                                          description="Percentual de municípios com Uber disponível por macrorregião",
-                                          height=300),
-                    ],
-                ),
-            ],
-        ),
-
-        # ── Seção 4: Perfil turístico ──────────────────────────────────
+        # ── Seção 4: Quadrantes de aproveitamento ──────────────────────
         html.Div(
             className="dash-card fade-up fade-up-5",
             children=[
-                html.Div("Aproveitamento Turístico dos Municípios (Quadrantes)", className="section-title"),
+                html.Div("Quadrantes de aproveitamento turístico", className="section-title"),
                 html.Hr(className="divider"),
                 create_chart_card(
                     "uni-quadrante", _build_quadrante_bar(),
-                    description="Classificação baseada em IDHM e oferta hoteleira observada — "
-                                "\"Alto IDH + Estrutura Limitada\" = potencial ainda pouco convertido em hospedagem",
+                    description="Classifica municípios por IDHM e oferta hoteleira observada. O quadrante de alto IDH com estrutura limitada aponta possível subaproveitamento, não uma conclusão sobre fluxo turístico real.",
                     height=300,
                 ),
             ],
@@ -277,19 +255,18 @@ layout = html.Div(
 # ─── Callbacks dinâmicos ──────────────────────────────────────────────────
 
 @callback(Output("uni-hist-dynamic", "figure"),
+          Output("uni-hist-desc", "children"),
           Input("uni-dd-var",   "value"),
           Input("uni-dd-regiao","value"))
 def update_hist(col, region):
-    return _build_hist_variable(col or "IDHM", region or "Todas")
+    col = col or "IDHM"
+    region = region or "Todas"
+    return _build_hist_variable(col, region), _hist_description(col, region)
 
 
 @callback(Output("uni-box-dynamic", "figure"),
+          Output("uni-box-desc", "children"),
           Input("uni-dd-box", "value"))
 def update_box(col):
-    return _build_boxplot_regions(col or "IDHM")
-
-
-@callback(Output("uni-bar-reg", "figure"),
-          Input("uni-dd-bar-reg", "value"))
-def update_bar_reg(col):
-    return _build_bar_regioes_col(col or "IDHM")
+    col = col or "IDHM"
+    return _build_boxplot_regions(col), _box_description(col)

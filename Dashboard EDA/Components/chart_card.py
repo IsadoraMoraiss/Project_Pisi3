@@ -63,8 +63,11 @@ PLOTLY_LAYOUT_DEFAULTS = dict(
     hoverlabel=dict(
         bgcolor="white",
         bordercolor="#E8EBF5",
-        font_family="DM Sans, sans-serif",
-        font_size=12,
+        font=dict(
+            family="DM Sans, sans-serif",
+            size=12,
+            color=STORY_COLORS["text"],
+        ),
     ),
 )
 
