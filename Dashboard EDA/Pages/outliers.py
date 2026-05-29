@@ -22,7 +22,7 @@ PALETTE = {
 OUTLIER_VARS = [
     {"label": "IDHM",                "value": "IDHM"},
     {"label": "PIB per capita (R$)",  "value": "GDP_CAPITA"},
-    {"label": "Leitos / 1000 hab",   "value": "leitos_1000hab"},
+    {"label": "Oferta Hoteleira Observada", "value": "indice_oferta_hoteleira_observada"},
     {"label": "Empresas de Tech",    "value": "COMP_J"},
     {"label": "PIB Agropecuário",    "value": "GVA_AGROPEC"},
     {"label": "% Agro no GVA",       "value": "pct_agro_gva"},
@@ -44,11 +44,11 @@ def _n_outliers(col: str, threshold: float = 2.0) -> int:
 
 def _build_boxmulti() -> go.Figure:
     fig = go.Figure()
-    # IDHM, leitos_1000hab, pct_agro_gva — normalizado para mesma escala
+    # IDHM, oferta hoteleira e pct_agro_gva — normalizado para mesma escala
     specs = [
         ("IDHM",          "IDHM ×100",     lambda v: v * 100,   STORY_COLORS["accent_blue"]),
         ("pct_agro_gva",  "% Agro GVA",   lambda v: v,          STORY_COLORS["positive"]),
-        ("leitos_1000hab","Leitos/1k hab", lambda v: v,          STORY_COLORS["warning"]),
+        ("indice_oferta_hoteleira_observada", "Oferta hotel.", lambda v: v, STORY_COLORS["warning"]),
     ]
     for col, name, fn, color in specs:
         vals = DF[col].dropna()
@@ -132,14 +132,14 @@ def _build_hist_z(col: str) -> go.Figure:
 
 _N_OUT_IDH   = _n_outliers("IDHM")
 _N_OUT_GDP   = _n_outliers("GDP_CAPITA")
-_N_OUT_LEITO = _n_outliers("leitos_1000hab")
+_N_OUT_LEITO = _n_outliers("indice_oferta_hoteleira_observada")
 
 SUMMARY_TILES = [
     create_metric_tile("fa-solid fa-triangle-exclamation", "Outliers — IDHM",
                        str(_N_OUT_IDH),  "Z-score > |2|", "red",   anim_class="fade-up fade-up-2"),
     create_metric_tile("fa-solid fa-triangle-exclamation", "Outliers — PIB/cap",
                        str(_N_OUT_GDP),  "Z-score > |2|", "gold",  anim_class="fade-up fade-up-3"),
-    create_metric_tile("fa-solid fa-triangle-exclamation", "Outliers — Leitos/1k",
+    create_metric_tile("fa-solid fa-triangle-exclamation", "Outliers — Oferta hotel.",
                        str(_N_OUT_LEITO),"Z-score > |2|", "green", anim_class="fade-up fade-up-4"),
 ]
 
