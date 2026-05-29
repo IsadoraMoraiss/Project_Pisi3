@@ -27,7 +27,7 @@ VAR_OPTIONS = [
     {"label": "PIB per capita (R$)",     "value": "GDP_CAPITA"},
     {"label": "População Estimada",      "value": "ESTIMATED_POP"},
     {"label": "Hotéis",                  "value": "HOTELS"},
-    {"label": "Leitos / 1000 hab",       "value": "leitos_1000hab"},
+    {"label": "Oferta Hoteleira Observada", "value": "indice_oferta_hoteleira_observada"},
     {"label": "Empresas de Tech",        "value": "COMP_J"},
     {"label": "PIB Agropecuário (R$)",   "value": "GVA_AGROPEC"},
     {"label": "Serviços Alojamento",     "value": "COMP_I"},
@@ -123,10 +123,10 @@ def _build_uber_bar() -> go.Figure:
 
 def _build_quadrante_bar() -> go.Figure:
     QUAD_COLORS = {
-        "Alto IDH + Baixa Estrutura": STORY_COLORS["warning"],
-        "Alto IDH + Alta Estrutura":  STORY_COLORS["positive"],
-        "Alta Estrutura + Baixo IDH": STORY_COLORS["accent"],
-        "Outros":                     STORY_COLORS["context"],
+        "Alto IDH + Estrutura Limitada":       STORY_COLORS["warning"],
+        "Alto IDH + Alta Oferta Hoteleira":    STORY_COLORS["positive"],
+        "Alta Oferta + Baixo IDH":             STORY_COLORS["accent"],
+        "Outros":                              STORY_COLORS["context"],
     }
     grp = DF["quadrante"].value_counts()
     fig = go.Figure(go.Bar(
@@ -264,8 +264,8 @@ layout = html.Div(
                 html.Hr(className="divider"),
                 create_chart_card(
                     "uni-quadrante", _build_quadrante_bar(),
-                    description="Classificação baseada em IDHM e leitos/1000hab — "
-                                "\"Alto IDH + Baixa Estrutura\" = potencial ainda pouco convertido em hospedagem",
+                    description="Classificação baseada em IDHM e oferta hoteleira observada — "
+                                "\"Alto IDH + Estrutura Limitada\" = potencial ainda pouco convertido em hospedagem",
                     height=300,
                 ),
             ],

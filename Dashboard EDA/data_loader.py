@@ -81,6 +81,7 @@ def _load() -> pd.DataFrame:
 
     # Features derivadas
     df["REGIAO"] = df["STATE"].map(STATE_TO_REGION).fillna("Desconhecido")
+    # Mantidas para análises específicas, mas não usadas como indicador principal.
     df["leitos_por_hab"]  = df["BEDS"]   / (df["IBGE_RES_POP"] + 1)
     df["leitos_1000hab"]  = df["leitos_por_hab"] * 1000
     df["hoteis_por_hab"]  = df["HOTELS"] / (df["IBGE_RES_POP"] + 1)
@@ -88,17 +89,29 @@ def _load() -> pd.DataFrame:
     df["agencias_total"]  = df[["Pr_Agencies", "Pu_Agencies"]].sum(axis=1)
     df["pct_agro_gva"]    = df["GVA_AGROPEC"] / (df["GVA_TOTAL"].replace(0, np.nan)) * 100
 
+    def _positive_percentile_score(series):
+        values = pd.to_numeric(series, errors="coerce").fillna(0)
+        score = pd.Series(0.0, index=values.index)
+        positive = values > 0
+        score.loc[positive] = values.loc[positive].rank(pct=True, method="average") * 100
+        return score
+
     # ──────────────────────────────────────────────────────────────────────────
-    # 🟣 1. ÍNDICE DE PRESSÃO TURÍSTICA (0-100)
-    # Fórmula: (leitos por habitante) / max(leitos por hab) * 100
+    # 1. OFERTA HOTELEIRA OBSERVADA (0-100)
+    # Percentil composto do volume absoluto de hotéis e leitos cadastrados.
     # ──────────────────────────────────────────────────────────────────────────
-    max_leitos_hab = df["leitos_por_hab"].max()
-    df["indice_pressao_turistica"] = (df["leitos_por_hab"] / max_leitos_hab * 100).fillna(0).round(1)
+    hoteis_score = _positive_percentile_score(df["HOTELS"])
+    leitos_score = _positive_percentile_score(df["BEDS"])
+    df["indice_oferta_hoteleira_observada"] = (
+        leitos_score * 0.65 + hoteis_score * 0.35
+    ).round(1)
+    df["indice_densidade_hoteleira_relativa"] = df["indice_oferta_hoteleira_observada"]
+    df["indice_pressao_turistica"] = df["indice_oferta_hoteleira_observada"]
     
-    # Categorização
+    # Categorização relativa da oferta hoteleira.
     df["pressao_turistica_cat"] = pd.cut(
         df["indice_pressao_turistica"],
-        bins=[0, 25, 50, 100],
+        bins=[0, 33, 67, 100],
         labels=["Baixa", "Média", "Alta"],
         include_lowest=True
     )
@@ -164,27 +177,6 @@ def _load() -> pd.DataFrame:
     df["indice_modernizacao"] = df.apply(_calc_modernizacao, axis=1).fillna(0).round(1)
 
     # ──────────────────────────────────────────────────────────────────────────
-    # 🔴 5. POTENCIAL DE "JOIA ESCONDIDA" (0-100)
-    # Alto: IDH + infraestrutura + serviços + Uber
-    # Baixo: fluxo turístico oficial + hotéis + visibilidade
-    # ──────────────────────────────────────────────────────────────────────────
-    def _calc_joia_potencial(row):
-        # Componente positivo (oferta)
-        idh_norm = row["IDHM"] / 1.0  # IDHM vai até 1
-        infra_norm = row["indice_infraestrutura"] / 100
-        moderniz_norm = row["indice_modernizacao"] / 100
-        
-        # Componente negativo (saturação turística)
-        pressao_norm = row["indice_pressao_turistica"] / 100
-        
-        # Score: quanto maior o potencial, melhor
-        # Alto potencial = bom desenvolvimento + menor densidade hoteleira relativa
-        score = ((idh_norm * 0.35 + infra_norm * 0.30 + moderniz_norm * 0.20) * (1 - pressao_norm * 0.15)) * 100
-        return score
-    
-    df["potencial_joia_escondida"] = df.apply(_calc_joia_potencial, axis=1).fillna(0).round(1)
-
-    # ──────────────────────────────────────────────────────────────────────────
     # 🟡 6. ÍNDICE DE ACESSIBILIDADE (0-100)
     # "Cidade preparada para turista independente"
     # Usa: Uber, Bancos, Correios (representado por serviços), Telefones
@@ -231,13 +223,37 @@ def _load() -> pd.DataFrame:
     
     df["indice_diversidade_economica"] = df.apply(_calc_diversidade_economica, axis=1).fillna(0).round(1)
 
+    # ──────────────────────────────────────────────────────────────────────────
+    # 8. POTENCIAL TURÍSTICO NÃO CONVERTIDO (proxy, 0-100)
+    # Potencial estimado: IDHM, conveniência urbana, diversidade econômica e categoria MTur.
+    # Estrutura observada: oferta hoteleira e infraestrutura cadastrada.
+    # ──────────────────────────────────────────────────────────────────────────
+    categoria_score = (
+        df["CATEGORIA_TUR"].astype(str).str.strip()
+        .map({"A": 100, "B": 80, "C": 60, "D": 40, "E": 20})
+        .fillna(0)
+    )
+    df["indice_potencial_turistico_proxy"] = (
+        df["IDHM"].clip(lower=0, upper=1) * 100 * 0.35
+        + df["indice_modernizacao"] * 0.25
+        + df["indice_diversidade_economica"] * 0.15
+        + categoria_score * 0.25
+    ).clip(lower=0, upper=100).round(1)
+    df["indice_conversao_turistica_proxy"] = (
+        df["indice_oferta_hoteleira_observada"] * 0.45
+        + df["indice_infraestrutura"] * 0.55
+    ).clip(lower=0, upper=100).round(1)
+    df["potencial_joia_escondida"] = (
+        df["indice_potencial_turistico_proxy"] - df["indice_conversao_turistica_proxy"]
+    ).clip(lower=0, upper=100).round(1)
+
     # Quadrante turístico (P4 da EDA)
     idhm_p70      = df["IDHM"].quantile(0.70)
-    mediana_leitos = df["leitos_1000hab"].median()
+    oferta_p90 = df["indice_oferta_hoteleira_observada"].quantile(0.90)
     df["quadrante"] = "Outros"
-    df.loc[(df["IDHM"] >= idhm_p70) & (df["leitos_1000hab"] <= mediana_leitos), "quadrante"] = "Alto IDH + Baixa Estrutura"
-    df.loc[(df["IDHM"] >= idhm_p70) & (df["leitos_1000hab"] >  mediana_leitos), "quadrante"] = "Alto IDH + Alta Estrutura"
-    df.loc[(df["IDHM"] <  idhm_p70) & (df["leitos_1000hab"] >  mediana_leitos), "quadrante"] = "Alta Estrutura + Baixo IDH"
+    df.loc[(df["IDHM"] >= idhm_p70) & (df["indice_oferta_hoteleira_observada"] <= oferta_p90), "quadrante"] = "Alto IDH + Estrutura Limitada"
+    df.loc[(df["IDHM"] >= idhm_p70) & (df["indice_oferta_hoteleira_observada"] >  oferta_p90), "quadrante"] = "Alto IDH + Alta Oferta Hoteleira"
+    df.loc[(df["IDHM"] <  idhm_p70) & (df["indice_oferta_hoteleira_observada"] >  oferta_p90), "quadrante"] = "Alta Oferta + Baixo IDH"
 
     return df
 
@@ -393,23 +409,29 @@ def city_summary(city: str) -> dict:
     n_cities = len(DF)
     city_mask = DF["CITY"] == city
 
-    def _rank_city_col(column: str) -> int:
-        """Maior valor = melhor; empates na mesma posição (alinhado a região/estado)."""
+    def _rank_city_col(column: str, min_value: float | None = None) -> int | None:
+        """Maior valor = melhor; empates na mesma posição.
+
+        Para indicadores de estrutura, valores nulos ou quase nulos não recebem
+        ranking para evitar que grandes empates em zero pareçam bom desempenho.
+        """
+        if min_value is not None and float(row[column]) <= min_value:
+            return None
         return int(DF[column].rank(ascending=False, method="min")[city_mask].iloc[0])
 
     rank_idh = _rank_city_col("IDHM")
-    rank_tech = _rank_city_col("COMP_J")
-    rank_hotel = _rank_city_col("HOTELS")
-    rank_beds = _rank_city_col("BEDS")
-    rank_uber = _rank_city_col("UBER")
+    rank_tech = _rank_city_col("COMP_J", min_value=0)
+    rank_hotel = _rank_city_col("HOTELS", min_value=0)
+    rank_beds = _rank_city_col("BEDS", min_value=0)
+    rank_uber = _rank_city_col("UBER", min_value=0)
     rank_pop = _rank_city_col("ESTIMATED_POP")
     rank_agro = _rank_city_col("GVA_AGROPEC")
-    rank_pressao = _rank_city_col("indice_pressao_turistica")
-    rank_infra = _rank_city_col("indice_infraestrutura")
-    rank_moderniz = _rank_city_col("indice_modernizacao")
-    rank_joia = _rank_city_col("potencial_joia_escondida")
-    rank_acessib = _rank_city_col("indice_acessibilidade")
-    rank_diversid = _rank_city_col("indice_diversidade_economica")
+    rank_pressao = _rank_city_col("indice_pressao_turistica", min_value=0.5)
+    rank_infra = _rank_city_col("indice_infraestrutura", min_value=0.5)
+    rank_moderniz = _rank_city_col("indice_modernizacao", min_value=0.5)
+    rank_joia = _rank_city_col("potencial_joia_escondida", min_value=0.5)
+    rank_acessib = _rank_city_col("indice_acessibilidade", min_value=0.5)
+    rank_diversid = _rank_city_col("indice_diversidade_economica", min_value=0.5)
     
     return {
         # Métricas originais

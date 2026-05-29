@@ -20,7 +20,7 @@ AXIS_OPTIONS = [
     {"label": "PIB per capita (R$)",    "value": "GDP_CAPITA"},
     {"label": "População Estimada",     "value": "ESTIMATED_POP"},
     {"label": "Hotéis",                 "value": "HOTELS"},
-    {"label": "Leitos / 1000 hab",      "value": "leitos_1000hab"},
+    {"label": "Oferta Hoteleira Observada", "value": "indice_oferta_hoteleira_observada"},
     {"label": "Empresas de Tech",       "value": "COMP_J"},
     {"label": "PIB Agropecuário",       "value": "GVA_AGROPEC"},
     {"label": "Serviços Aloj./Aliment.","value": "COMP_I"},
@@ -34,7 +34,7 @@ AXIS_LABELS = {o["value"]: o["label"] for o in AXIS_OPTIONS}
 CORR_COLS = {
     "IDHM":          "IDHM",
     "GDP_CAPITA":     "PIB/cap",
-    "leitos_1000hab": "Leitos/1k",
+    "indice_oferta_hoteleira_observada": "Oferta Hotel.",
     "COMP_J":         "Tech",
     "COMP_I":         "Alojam.",
     "GVA_AGROPEC":    "Agro",

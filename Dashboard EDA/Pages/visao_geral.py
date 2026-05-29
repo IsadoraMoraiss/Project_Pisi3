@@ -39,7 +39,7 @@ _diversidade_media = DF["indice_diversidade_economica"].mean()
 
 METRICS_PAIS = [
     dict(icon="fa-solid fa-gem",           label="Potencial Não Convertido",  value=f"{_joia_media:.0f}",          sub="Proxy nacional",                    color="purple"),
-    dict(icon="fa-solid fa-gauge-high",    label="Densidade Hoteleira Relativa", value=f"{_pressao_media:.0f}",     sub="Leitos por habitante",              color="red"),
+    dict(icon="fa-solid fa-gauge-high",    label="Oferta Hoteleira Observada", value=f"{_pressao_media:.0f}",       sub="Percentil de hotéis e leitos",      color="red"),
     dict(icon="fa-solid fa-building",      label="Infraestrutura Turística Média", value=f"{_infra_media:.0f}",     sub="Índice 0-100",                      color="navy"),
     dict(icon="fa-solid fa-star",          label="IDH Médio",                 value=f"{_idh_medio:.3f}",           sub="Média nacional (IDHM)",             color="blue"),
     dict(icon="fa-solid fa-sitemap",       label="Diversidade Econômica",     value=f"{_diversidade_media:.0f}",   sub="Média nacional",                    color="orange"),
@@ -103,17 +103,19 @@ def _rank_band(pos: int | None, total: int | None, higher_label: str, middle_lab
 
 def _geo_profile(s: dict, total: int) -> str:
     idh_top = s["rank_idh"] / total <= 0.33
-    infra_top = s["rank_infra"] / total <= 0.33
+    infra_value = _as_float(s["infraestrutura"])
+    offer_value = _as_float(s["pressao_turistica"])
+    infra_top = s["rank_infra"] / total <= 0.33 and infra_value >= 5
     joia_top = s["rank_joia"] / total <= 0.33
-    infra_low = s["rank_infra"] / total >= 0.67
-    pressure_top = s["rank_pressao"] / total <= 0.33 and _as_float(s["pressao_turistica"]) > 0
+    infra_low = s["rank_infra"] / total >= 0.67 or infra_value < 5
+    offer_top = s["rank_pressao"] / total <= 0.33 and offer_value >= 33
 
-    if idh_top and infra_top:
+    if idh_top and infra_top and offer_top:
         return "base turística consolidada"
-    if joia_top and not pressure_top:
-        return "potencial turístico pouco convertido"
     if idh_top and infra_low:
         return "qualidade de vida com estrutura turística ainda baixa"
+    if joia_top and not offer_top:
+        return "potencial turístico pouco convertido"
     if infra_top and not idh_top:
         return "estrutura turística relevante, mas com alerta social"
     return "perfil intermediário para comparação com pares"
@@ -122,17 +124,22 @@ def _geo_profile(s: dict, total: int) -> str:
 def _city_profile(s: dict) -> str:
     total = s["n_cities"]
     idh_top = s["rank_idh"] / total <= 0.30
-    infra_top = s["rank_infra"] / total <= 0.20
-    joia_top = s["rank_joia"] / total <= 0.20
-    infra_low = s["rank_infra"] / total >= 0.70
-    pressure_top = s["rank_pressao"] / total <= 0.10 and _as_float(s["pressao_turistica"]) > 0
+    infra_value = _as_float(s["infraestrutura"])
+    offer_value = _as_float(s["pressao_turistica"])
+    rank_infra = s.get("rank_infra")
+    rank_joia = s.get("rank_joia")
+    rank_offer = s.get("rank_pressao")
+    infra_top = bool(rank_infra) and rank_infra / total <= 0.20 and infra_value >= 5
+    joia_top = bool(rank_joia) and rank_joia / total <= 0.20
+    infra_low = not rank_infra or rank_infra / total >= 0.70 or infra_value < 5
+    offer_top = bool(rank_offer) and rank_offer / total <= 0.10 and offer_value >= 67
 
-    if idh_top and infra_top:
+    if idh_top and infra_top and offer_top:
         return "base turística consolidada"
-    if joia_top and not pressure_top:
-        return "potencial turístico pouco convertido"
     if idh_top and infra_low:
         return "qualidade de vida com estrutura turística baixa"
+    if joia_top and not offer_top:
+        return "potencial turístico pouco convertido"
     if infra_top and not idh_top:
         return "estrutura turística com fragilidade social"
     return "perfil intermediário"
@@ -155,9 +162,9 @@ def _diagnosis_panel(text: str, detail: str) -> html.Div:
 
 def _diagnosis_pais() -> html.Div:
     text = (
-        f"O conjunto nacional combina IDH médio {_idh_medio:.3f}, densidade hoteleira relativa média "
+        f"O conjunto nacional combina IDH médio {_idh_medio:.3f}, oferta hoteleira observada média "
         f"{_pressao_media:.1f} e infraestrutura média {_infra_media:.1f}. A leitura principal "
-        "é separar municípios consolidados daqueles com bons fundamentos e estrutura hoteleira ainda limitada."
+        "é separar municípios consolidados daqueles com bons fundamentos e oferta hoteleira ainda limitada."
     )
     detail = (
         "Use os filtros de Região, Estado e Cidade para transformar o panorama nacional em diagnóstico "
@@ -172,7 +179,7 @@ def _diagnosis_region(region: str, s: dict) -> html.Div:
     idh_band = _rank_band(s["rank_idh"], total, "IDH entre os mais altos", "IDH intermediário", "IDH entre os mais baixos")
     infra_band = _rank_band(s["rank_infra"], total, "infraestrutura entre as mais altas", "infraestrutura intermediária", "infraestrutura entre as mais baixas")
     text = (
-        f"{region} combina IDH médio {s['idh']}, densidade hoteleira relativa {s['pressao_turistica']} "
+        f"{region} combina IDH médio {s['idh']}, oferta hoteleira observada {s['pressao_turistica']} "
         f"e infraestrutura {s['infraestrutura']}. Perfil provável: {profile}."
     )
     detail = f"Leitura de apoio: {idh_band} e {infra_band} no comparativo entre macrorregiões."
@@ -185,7 +192,7 @@ def _diagnosis_state(state: str, s: dict) -> html.Div:
     idh_band = _rank_band(s["rank_idh"], total, "IDH no grupo superior", "IDH intermediário", "IDH no grupo inferior")
     infra_band = _rank_band(s["rank_infra"], total, "infraestrutura no grupo superior", "infraestrutura intermediária", "infraestrutura no grupo inferior")
     text = (
-        f"{state} combina IDH médio {s['idh']}, densidade hoteleira relativa {s['pressao_turistica']} "
+        f"{state} combina IDH médio {s['idh']}, oferta hoteleira observada {s['pressao_turistica']} "
         f"e infraestrutura {s['infraestrutura']}. Perfil provável: {profile}."
     )
     detail = f"Leitura de apoio: {idh_band} e {infra_band} no comparativo entre estados."
@@ -195,7 +202,7 @@ def _diagnosis_state(state: str, s: dict) -> html.Div:
 def _diagnosis_city(city: str, s: dict) -> html.Div:
     profile = _city_profile(s)
     text = (
-        f"{city} combina IDHM {s['idh']}, densidade hoteleira relativa {s['pressao_turistica']} "
+        f"{city} combina IDHM {s['idh']}, oferta hoteleira observada {s['pressao_turistica']} "
         f"({s['pressao_cat']}) e infraestrutura {s['infraestrutura']}. Perfil provável: {profile}."
     )
     detail = (
@@ -227,7 +234,7 @@ def _build_region_grid(region: str):
     n = 5  # total de regiões
     core_specs = [
         ("fa-solid fa-gem",          "Potencial Não Convertido", s["joia_potencial"],   "Proxy 0-100",                 "purple", s["rank_joia"],    n, "regiões"),
-        ("fa-solid fa-gauge-high",   "Densidade Hoteleira Relativa", s["pressao_turistica"], "Leitos por habitante",     "red",    s["rank_pressao"], n, "regiões"),
+        ("fa-solid fa-gauge-high",   "Oferta Hoteleira Observada", s["pressao_turistica"], "Percentil de hotéis e leitos", "red", s["rank_pressao"], n, "regiões"),
         ("fa-solid fa-building",     "Infraestrutura Turística",s["infraestrutura"],    "Índice 0-100",                "navy",   s["rank_infra"],   n, "regiões"),
         ("fa-solid fa-star",         "IDH Médio",               s["idh"],               "IDHM da região",              "blue",   s["rank_idh"],     n, "regiões"),
     ]
@@ -255,7 +262,7 @@ def _build_state_grid(state: str):
     n = s["n_states"]
     core_specs = [
         ("fa-solid fa-gem",          "Potencial Não Convertido", s["joia_potencial"],   "Proxy 0-100",                 "purple", s["rank_joia"],    n, "estados"),
-        ("fa-solid fa-gauge-high",   "Densidade Hoteleira Relativa", s["pressao_turistica"], "Leitos por habitante",     "red",    s["rank_pressao"], n, "estados"),
+        ("fa-solid fa-gauge-high",   "Oferta Hoteleira Observada", s["pressao_turistica"], "Percentil de hotéis e leitos", "red", s["rank_pressao"], n, "estados"),
         ("fa-solid fa-building",     "Infraestrutura Turística",s["infraestrutura"],    "Índice 0-100",                "navy",   s["rank_infra"],   n, "estados"),
         ("fa-solid fa-star",         "IDH Médio",               s["idh"],               "IDHM estadual",               "blue",   s["rank_idh"],     n, "estados"),
     ]
@@ -286,7 +293,7 @@ def _build_city_grid(city: str):
     
     core_specs = [
         ("fa-solid fa-gem",          "Potencial Não Convertido", s["joia_potencial"],   "Proxy 0-100",                  "purple", s["rank_joia"],    n, "cidades"),
-        ("fa-solid fa-gauge-high",   "Densidade Hoteleira Relativa", s["pressao_turistica"], f"Categoria: {s['pressao_cat']}", "red", s["rank_pressao"], n, "cidades"),
+        ("fa-solid fa-gauge-high",   "Oferta Hoteleira Observada", s["pressao_turistica"], f"Categoria: {s['pressao_cat']}", "red", s["rank_pressao"], n, "cidades"),
         ("fa-solid fa-building",     "Infraestrutura Turística",s["infraestrutura"],    "Índice 0-100",                 "navy",   s["rank_infra"],   n, "cidades"),
         ("fa-solid fa-star",         "IDH Municipal",           s["idh"],               f"Estado: {s['state']}",        "blue",   s["rank_idh"],     n, "cidades"),
     ]
@@ -390,7 +397,7 @@ layout = html.Div(
             children=[
                 html.Div("Visão Geral", className="page-title fade-up fade-up-1"),
                 html.Div(
-                    "Diagnóstico do recorte selecionado: potencial, infraestrutura, densidade hoteleira e desigualdade de aproveitamento",
+                    "Diagnóstico do recorte selecionado: potencial, infraestrutura, oferta hoteleira e desigualdade de aproveitamento",
                     className="page-subtitle fade-up fade-up-1",
                 ),
             ],
