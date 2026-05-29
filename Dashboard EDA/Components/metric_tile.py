@@ -13,6 +13,7 @@ def create_metric_tile(
     sub: str = "",
     color: str = "blue",
     ranking: dict | None = None,
+    explanation: str = "",
     anim_class: str = "fade-up fade-up-1",
 ) -> html.Div:
     """
@@ -26,6 +27,7 @@ def create_metric_tile(
     sub        : legenda complementar
     color      : 'blue' | 'gold' | 'green' | 'teal' | 'red' | 'navy'
     ranking    : dict com 'pos', 'total', 'label' para exibir barra de ranking
+    explanation: leitura curta sobre o que a métrica indica
     anim_class : classes CSS de animação
     """
     children = [
@@ -39,6 +41,17 @@ def create_metric_tile(
 
     if sub:
         children.append(html.Div(sub, className="metric-tile-sub"))
+
+    if explanation:
+        children.append(
+            html.Div(
+                [
+                    html.Span("Leitura: ", className="metric-tile-explanation-label"),
+                    html.Span(explanation),
+                ],
+                className="metric-tile-explanation",
+            )
+        )
 
     if ranking:
         pos   = ranking.get("pos", 1)

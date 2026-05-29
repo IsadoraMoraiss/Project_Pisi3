@@ -52,13 +52,42 @@ METRICS_PAIS = [
 ]
 
 
+EXPLANATIONS_BY_LABEL = {
+    "Potencial Não Convertido": "Gap proxy entre potencial estimado e estrutura turística observada. Alto valor sugere oportunidade, não fluxo real medido.",
+    "Oferta Hoteleira Observada": "Percentil composto de hotéis e leitos cadastrados. Não divide pela população residente.",
+    "Infraestrutura Turística Média": "Combina hospedagem, agências, bancos e mobilidade por app como suporte operacional ao turista.",
+    "Infraestrutura Turística": "Combina hospedagem, agências, bancos e mobilidade por app como suporte operacional ao turista.",
+    "IDH Médio": "Resume desenvolvimento humano do recorte e ajuda a comparar bases sociais semelhantes.",
+    "IDH Municipal": "Indica qualidade de vida local; não mede atratividade turística sozinho.",
+    "Diversidade Econômica": "Mostra quão distribuída é a economia entre setores; maior diversidade reduz dependência setorial.",
+    "População Estimada": "Dimensiona o território analisado; deve contextualizar, não substituir indicadores turísticos.",
+    "População": "Dimensiona o recorte e ajuda a interpretar volumes absolutos de estrutura.",
+    "Conveniência Urbana Média": "Proxy de suporte urbano e digital com mobilidade, telefonia, tecnologia e serviços financeiros.",
+    "Conveniência Urbana": "Proxy de suporte urbano e digital com mobilidade, telefonia, tecnologia e serviços financeiros.",
+    "Hotéis Cadastrados": "Conta meios de hospedagem registrados no dataset; valores zerados podem indicar ausência de cadastro.",
+    "Hotéis": "Conta meios de hospedagem registrados no dataset; valores zerados podem indicar ausência de cadastro.",
+    "Leitos Cadastrados": "Mostra capacidade de hospedagem registrada; ajuda a diferenciar volume real de oferta.",
+    "Leitos": "Mostra capacidade de hospedagem registrada; ajuda a diferenciar volume real de oferta.",
+    "Municípios com Mobilidade por App": "Indica presença cadastrada de Uber, útil como sinal de autonomia de deslocamento.",
+    "Mobilidade por App": "Indica presença cadastrada de Uber, útil como sinal de autonomia de deslocamento.",
+    "Empresas de Tecnologia": "Conta empresas do CNAE J, usado como sinal de base digital e serviços modernos.",
+    "Perfil Econômico": "Mostra o setor predominante no valor adicionado; serviços não significam turismo automaticamente.",
+    "Autonomia Turística": "Proxy de conveniência ao visitante com mobilidade, bancos, serviços e comunicação.",
+}
+
+
 # ─── Helpers ──────────────────────────────────────────────────────────────
+
+def _explain(label: str) -> str:
+    return EXPLANATIONS_BY_LABEL.get(label, "")
+
 
 def _tile(icon, label, value, sub, color, pos, total, lbl_rank, i):
     ranking = dict(pos=pos, total=total, label=lbl_rank) if pos and total else None
     return create_metric_tile(
         icon=icon, label=label, value=value, sub=sub, color=color,
-        ranking=ranking, anim_class=ANIM_CLASSES[i % len(ANIM_CLASSES)],
+        ranking=ranking, explanation=_explain(label),
+        anim_class=ANIM_CLASSES[i % len(ANIM_CLASSES)],
     )
 
 
@@ -217,6 +246,7 @@ def _build_pais_grid():
         create_metric_tile(
             icon=m["icon"], label=m["label"], value=m["value"],
             sub=m["sub"], color=m["color"],
+            explanation=_explain(m["label"]),
             anim_class=ANIM_CLASSES[i % len(ANIM_CLASSES)],
         )
         for i, m in enumerate(METRICS_PAIS)
