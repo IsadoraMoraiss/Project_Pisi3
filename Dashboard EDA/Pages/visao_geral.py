@@ -38,7 +38,7 @@ _moderniz_media = DF["indice_modernizacao"].mean()
 _diversidade_media = DF["indice_diversidade_economica"].mean()
 
 METRICS_PAIS = [
-    dict(icon="fa-solid fa-gem",           label="Potencial Não Convertido",  value=f"{_joia_media:.0f}",          sub="Proxy nacional",                    color="purple"),
+    dict(icon="fa-solid fa-gem",           label="Potencial Não Convertido",  value=f"{_joia_media:.0f}",          sub="Índice nacional",                   color="purple"),
     dict(icon="fa-solid fa-gauge-high",    label="Oferta Hoteleira Observada", value=f"{_pressao_media:.0f}",       sub="Percentil de hotéis e leitos",      color="red"),
     dict(icon="fa-solid fa-building",      label="Infraestrutura Turística Média", value=f"{_infra_media:.0f}",     sub="Índice 0-100",                      color="navy"),
     dict(icon="fa-solid fa-star",          label="IDH Médio",                 value=f"{_idh_medio:.3f}",           sub="Média nacional (IDHM)",             color="blue"),
@@ -53,7 +53,7 @@ METRICS_PAIS = [
 
 
 EXPLANATIONS_BY_LABEL = {
-    "Potencial Não Convertido": "Gap proxy entre potencial estimado e estrutura turística observada. Alto valor sugere oportunidade, não fluxo real medido.",
+    "Potencial Não Convertido": "Diferença estimada entre potencial e estrutura turística observada. Alto valor sugere oportunidade, não fluxo real medido.",
     "Oferta Hoteleira Observada": "Percentil composto de hotéis e leitos cadastrados. Não divide pela população residente.",
     "Infraestrutura Turística Média": "Combina hospedagem, agências, bancos e mobilidade por app como suporte operacional ao turista.",
     "Infraestrutura Turística": "Combina hospedagem, agências, bancos e mobilidade por app como suporte operacional ao turista.",
@@ -62,8 +62,8 @@ EXPLANATIONS_BY_LABEL = {
     "Diversidade Econômica": "Mostra quão distribuída é a economia entre setores; maior diversidade reduz dependência setorial.",
     "População Estimada": "Dimensiona o território analisado; deve contextualizar, não substituir indicadores turísticos.",
     "População": "Dimensiona o recorte e ajuda a interpretar volumes absolutos de estrutura.",
-    "Conveniência Urbana Média": "Proxy de suporte urbano e digital com mobilidade, telefonia, tecnologia e serviços financeiros.",
-    "Conveniência Urbana": "Proxy de suporte urbano e digital com mobilidade, telefonia, tecnologia e serviços financeiros.",
+    "Conveniência Urbana Média": "Aproxima suporte urbano e digital com mobilidade, telefonia, tecnologia e serviços financeiros.",
+    "Conveniência Urbana": "Aproxima suporte urbano e digital com mobilidade, telefonia, tecnologia e serviços financeiros.",
     "Hotéis Cadastrados": "Conta meios de hospedagem registrados no dataset; valores zerados podem indicar ausência de cadastro.",
     "Hotéis": "Conta meios de hospedagem registrados no dataset; valores zerados podem indicar ausência de cadastro.",
     "Leitos Cadastrados": "Mostra capacidade de hospedagem registrada; ajuda a diferenciar volume real de oferta.",
@@ -72,7 +72,7 @@ EXPLANATIONS_BY_LABEL = {
     "Mobilidade por App": "Indica presença cadastrada de Uber, útil como sinal de autonomia de deslocamento.",
     "Empresas de Tecnologia": "Conta empresas do CNAE J, usado como sinal de base digital e serviços modernos.",
     "Perfil Econômico": "Mostra o setor predominante no valor adicionado; serviços não significam turismo automaticamente.",
-    "Autonomia Turística": "Proxy de conveniência ao visitante com mobilidade, bancos, serviços e comunicação.",
+    "Autonomia Turística": "Aproxima conveniência ao visitante com mobilidade, bancos, serviços e comunicação.",
 }
 
 
@@ -263,7 +263,7 @@ def _build_region_grid(region: str):
     s = region_summary(region)
     n = 5  # total de regiões
     core_specs = [
-        ("fa-solid fa-gem",          "Potencial Não Convertido", s["joia_potencial"],   "Proxy 0-100",                 "purple", s["rank_joia"],    n, "regiões"),
+        ("fa-solid fa-gem",          "Potencial Não Convertido", s["joia_potencial"],   "Índice 0-100",                "purple", s["rank_joia"],    n, "regiões"),
         ("fa-solid fa-gauge-high",   "Oferta Hoteleira Observada", s["pressao_turistica"], "Percentil de hotéis e leitos", "red", s["rank_pressao"], n, "regiões"),
         ("fa-solid fa-building",     "Infraestrutura Turística",s["infraestrutura"],    "Índice 0-100",                "navy",   s["rank_infra"],   n, "regiões"),
         ("fa-solid fa-star",         "IDH Médio",               s["idh"],               "IDHM da região",              "blue",   s["rank_idh"],     n, "regiões"),
@@ -291,7 +291,7 @@ def _build_state_grid(state: str):
     s = state_summary(state)
     n = s["n_states"]
     core_specs = [
-        ("fa-solid fa-gem",          "Potencial Não Convertido", s["joia_potencial"],   "Proxy 0-100",                 "purple", s["rank_joia"],    n, "estados"),
+        ("fa-solid fa-gem",          "Potencial Não Convertido", s["joia_potencial"],   "Índice 0-100",                "purple", s["rank_joia"],    n, "estados"),
         ("fa-solid fa-gauge-high",   "Oferta Hoteleira Observada", s["pressao_turistica"], "Percentil de hotéis e leitos", "red", s["rank_pressao"], n, "estados"),
         ("fa-solid fa-building",     "Infraestrutura Turística",s["infraestrutura"],    "Índice 0-100",                "navy",   s["rank_infra"],   n, "estados"),
         ("fa-solid fa-star",         "IDH Médio",               s["idh"],               "IDHM estadual",               "blue",   s["rank_idh"],     n, "estados"),
@@ -322,7 +322,7 @@ def _build_city_grid(city: str):
     n = s["n_cities"]
     
     core_specs = [
-        ("fa-solid fa-gem",          "Potencial Não Convertido", s["joia_potencial"],   "Proxy 0-100",                  "purple", s["rank_joia"],    n, "cidades"),
+        ("fa-solid fa-gem",          "Potencial Não Convertido", s["joia_potencial"],   "Índice 0-100",                 "purple", s["rank_joia"],    n, "cidades"),
         ("fa-solid fa-gauge-high",   "Oferta Hoteleira Observada", s["pressao_turistica"], f"Categoria: {s['pressao_cat']}", "red", s["rank_pressao"], n, "cidades"),
         ("fa-solid fa-building",     "Infraestrutura Turística",s["infraestrutura"],    "Índice 0-100",                 "navy",   s["rank_infra"],   n, "cidades"),
         ("fa-solid fa-star",         "IDH Municipal",           s["idh"],               f"Estado: {s['state']}",        "blue",   s["rank_idh"],     n, "cidades"),

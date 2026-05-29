@@ -26,7 +26,7 @@ VAR_OPTIONS = [
     {"label": "Oferta Hoteleira Observada", "value": "indice_oferta_hoteleira_observada"},
     {"label": "Infraestrutura Turística",  "value": "indice_infraestrutura"},
     {"label": "Potencial Não Convertido",  "value": "potencial_joia_escondida"},
-    {"label": "Conversão Turística Proxy", "value": "indice_conversao_turistica_proxy"},
+    {"label": "Conversão Turística", "value": "indice_conversao_turistica_proxy"},
     {"label": "Conveniência Urbana",       "value": "indice_modernizacao"},
     {"label": "Autonomia Turística",       "value": "indice_acessibilidade"},
     {"label": "Hotéis",                    "value": "HOTELS"},
@@ -43,7 +43,7 @@ VAR_EXPLANATIONS = {
     "IDHM": "Usado como base social: valores altos indicam melhores condições humanas, mas não garantem turismo convertido.",
     "indice_oferta_hoteleira_observada": "Mede a posição do município em hotéis e leitos absolutos, sem penalizar cidades populosas.",
     "indice_infraestrutura": "Resume estrutura operacional de apoio ao turista: hospedagem, agências, bancos e mobilidade por app.",
-    "potencial_joia_escondida": "Mostra o gap proxy entre potencial estimado e estrutura observada; alto valor sugere subaproveitamento.",
+    "potencial_joia_escondida": "Mostra a diferença estimada entre potencial e estrutura observada; alto valor sugere subaproveitamento.",
     "indice_conversao_turistica_proxy": "Representa estrutura turística já convertida em oferta observável no dataset.",
     "indice_modernizacao": "Indica conveniência urbana e digital, com sinais de mobilidade, tecnologia, telefonia e bancos.",
     "indice_acessibilidade": "Avalia autonomia do visitante por serviços, comunicação, bancos e mobilidade cadastrada.",
@@ -162,7 +162,7 @@ layout = html.Div(
             children=[
                 html.Div("Análise Univariada", className="page-title fade-up fade-up-1"),
                 html.Div(
-                    "Onde os municípios se posicionam nas distribuições de potencial, estrutura e conversão turística proxy",
+                    "Onde os municípios se posicionam nas distribuições de potencial, estrutura e conversão turística",
                     className="page-subtitle fade-up fade-up-1",
                 ),
             ],
