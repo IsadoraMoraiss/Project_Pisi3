@@ -22,9 +22,9 @@ ROBUST_Z_THRESHOLD = 3.5
 # ─── Variáveis para análise de outliers ──────────────────────────────────
 OUTLIER_VARS = [
     {"label": "IDHM",                      "value": "IDHM"},
-    {"label": "Potencial Turístico Proxy", "value": "indice_potencial_turistico_proxy"},
+    {"label": "Potencial Turístico", "value": "indice_potencial_turistico_proxy"},
     {"label": "Potencial Não Convertido",  "value": "potencial_joia_escondida"},
-    {"label": "Conversão Turística Proxy", "value": "indice_conversao_turistica_proxy"},
+    {"label": "Conversão Turística", "value": "indice_conversao_turistica_proxy"},
     {"label": "Oferta Hoteleira Observada", "value": "indice_oferta_hoteleira_observada"},
     {"label": "Infraestrutura Turística",  "value": "indice_infraestrutura"},
     {"label": "Conveniência Urbana",       "value": "indice_modernizacao"},
@@ -37,7 +37,7 @@ VAR_LABELS = {o["value"]: o["label"] for o in OUTLIER_VARS}
 VAR_EXPLANATIONS = {
     "IDHM": "desenvolvimento humano; outliers podem indicar base social muito acima ou abaixo do padrão nacional",
     "indice_potencial_turistico_proxy": "potencial estimado; outliers altos podem ser municípios com fundamentos fortes",
-    "potencial_joia_escondida": "gap proxy; outliers altos merecem investigação como possível subaproveitamento turístico",
+    "potencial_joia_escondida": "diferença estimada entre potencial e estrutura observada; outliers altos merecem investigação como possível subaproveitamento turístico",
     "indice_conversao_turistica_proxy": "estrutura já convertida; outliers altos sugerem concentração de estrutura turística",
     "indice_oferta_hoteleira_observada": "hotéis e leitos absolutos; outliers altos indicam forte oferta cadastrada",
     "indice_infraestrutura": "suporte operacional ao visitante; outliers altos indicam estrutura muito acima do padrão",
@@ -206,7 +206,7 @@ SUMMARY_TILES = [
                        str(_N_OUT_GAP), "Z robusto > |3,5|", "red",
                        explanation="Municípios com potencial não convertido muito fora do padrão robusto nacional.",
                        anim_class="fade-up fade-up-2"),
-    create_metric_tile("fa-solid fa-triangle-exclamation", "Outliers — Conversão Proxy",
+    create_metric_tile("fa-solid fa-triangle-exclamation", "Outliers — Conversão Turística",
                        str(_N_OUT_CONV), "Z robusto > |3,5|", "gold",
                        explanation="Municípios com estrutura turística observada muito fora do padrão robusto.",
                        anim_class="fade-up fade-up-3"),
@@ -228,7 +228,7 @@ layout = html.Div(
             children=[
                 html.Div("Outliers", className="page-title fade-up fade-up-1"),
                 html.Div(
-                    "Quais municípios fogem do padrão em potencial, oferta, infraestrutura e conversão turística proxy",
+                    "Quais municípios fogem do padrão em potencial, oferta, infraestrutura e conversão turística",
                     className="page-subtitle fade-up fade-up-1",
                 ),
             ],

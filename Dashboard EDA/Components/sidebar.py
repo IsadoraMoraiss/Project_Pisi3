@@ -27,7 +27,7 @@ NAV_ITEMS = [
     },
     {
         "id":    "nav-bivariada",
-        "icon":  "fa-solid fa-chart-scatter",
+        "icon":  "fa-solid fa-chart-bar",
         "label": "Análise Bi/Multivariada",
         "color": "#1ABC9C",
     },

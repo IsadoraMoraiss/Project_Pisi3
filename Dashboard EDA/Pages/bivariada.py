@@ -15,9 +15,9 @@ from data_loader import DF, ALL_REGIONS, REG_COLOR
 
 AXIS_OPTIONS = [
     {"label": "IDHM", "value": "IDHM"},
-    {"label": "Potencial Turístico Proxy", "value": "indice_potencial_turistico_proxy"},
+    {"label": "Potencial Turístico", "value": "indice_potencial_turistico_proxy"},
     {"label": "Potencial Não Convertido", "value": "potencial_joia_escondida"},
-    {"label": "Conversão Turística Proxy", "value": "indice_conversao_turistica_proxy"},
+    {"label": "Conversão Turística", "value": "indice_conversao_turistica_proxy"},
     {"label": "Oferta Hoteleira Observada", "value": "indice_oferta_hoteleira_observada"},
     {"label": "Infraestrutura Turística", "value": "indice_infraestrutura"},
     {"label": "Conveniência Urbana", "value": "indice_modernizacao"},
@@ -45,7 +45,7 @@ CORR_COLS = {
 AXIS_EXPLANATIONS = {
     "IDHM": "base social do município",
     "indice_potencial_turistico_proxy": "potencial estimado por IDHM, conveniência, diversidade e categoria turística",
-    "potencial_joia_escondida": "gap proxy entre potencial estimado e estrutura observada",
+    "potencial_joia_escondida": "diferença estimada entre potencial e estrutura observada",
     "indice_conversao_turistica_proxy": "estrutura já convertida em oferta observável no dataset",
     "indice_oferta_hoteleira_observada": "percentil composto de hotéis e leitos absolutos",
     "indice_infraestrutura": "suporte operacional ao visitante",
@@ -286,7 +286,7 @@ layout = html.Div(
             children=[
                 html.Div("Análise Bivariada", className="page-title fade-up fade-up-1"),
                 html.Div(
-                    "Quais fatores caminham juntos na formação de potencial, estrutura e conversão turística proxy",
+                    "Quais fatores caminham juntos na formação de potencial, estrutura e conversão turística",
                     className="page-subtitle fade-up fade-up-1",
                 ),
             ],
