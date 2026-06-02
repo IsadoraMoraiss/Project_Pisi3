@@ -7,8 +7,8 @@ import dash
 from dash import html, dcc, Input, Output, State
 import dash_bootstrap_components as dbc
 
-from components.sidebar import create_sidebar
-from pages import (
+from Components.sidebar import create_sidebar
+from Pages import (
     info_geral,
     visao_geral,
     univariada,
