@@ -321,6 +321,17 @@ body {
   color: var(--text-light);             /* Cinza claro */
 }
 
+.metric-tile-explanation {
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-sub);
+}
+
+.metric-tile-explanation-label {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
 /* ── Barra de ranking/progresso ──────────── */
 
 /* Contêiner da barra de ranking */

@@ -7,6 +7,26 @@ from dash import html, dcc
 import plotly.graph_objects as go
 
 
+STORY_COLORS = {
+    "text": "#243042",
+    "muted": "#6B7280",
+    "grid": "#E7EAF0",
+    "context": "#A0A7B4",
+    "accent": "#D1495B",
+    "accent_blue": "#2F6BFF",
+    "positive": "#2A9D8F",
+    "warning": "#E9A23B",
+}
+
+STORY_COLORWAY = [
+    "#4E79A7",
+    "#59A14F",
+    "#F28E2B",
+    "#E15759",
+    "#B07AA1",
+    "#76B7B2",
+]
+
 PLOTLY_CONFIG = dict(
     displayModeBar=True,
     displaylogo=False,
@@ -16,19 +36,20 @@ PLOTLY_CONFIG = dict(
 
 PLOTLY_LAYOUT_DEFAULTS = dict(
     font_family="DM Sans, sans-serif",
-    font_color="#1A2B6B",
+    font_color=STORY_COLORS["text"],
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
+    colorway=STORY_COLORWAY,
     margin=dict(l=8, r=8, t=16, b=8),
     xaxis=dict(
-        gridcolor="#EEF0F8",
-        linecolor="#EEF0F8",
-        zerolinecolor="#EEF0F8",
+        gridcolor=STORY_COLORS["grid"],
+        linecolor=STORY_COLORS["grid"],
+        zerolinecolor=STORY_COLORS["grid"],
     ),
     yaxis=dict(
-        gridcolor="#EEF0F8",
-        linecolor="#EEF0F8",
-        zerolinecolor="#EEF0F8",
+        gridcolor=STORY_COLORS["grid"],
+        linecolor=STORY_COLORS["grid"],
+        zerolinecolor=STORY_COLORS["grid"],
     ),
     legend=dict(
         orientation="h",
@@ -37,12 +58,16 @@ PLOTLY_LAYOUT_DEFAULTS = dict(
         xanchor="right",
         x=1,
         font_size=11,
+        font_color=STORY_COLORS["muted"],
     ),
     hoverlabel=dict(
         bgcolor="white",
         bordercolor="#E8EBF5",
-        font_family="DM Sans, sans-serif",
-        font_size=12,
+        font=dict(
+            family="DM Sans, sans-serif",
+            size=12,
+            color=STORY_COLORS["text"],
+        ),
     ),
 )
 
