@@ -124,26 +124,53 @@ def _chi_square_cramers_v(col_a: str, col_b: str) -> dict:
 
 
 def _build_scatter(x_col: str, y_col: str) -> go.Figure:
-    fig = go.Figure()
+    """
+    Substitui o scatterplot massivo por um Mapa de Densidade 2D (Contour)
+    e plota apenas as médias regionais (centroides) por cima para clareza visual.
+    """
     sub = DF.dropna(subset=[x_col, y_col])
+    PURPLE_SHADES = ["#CE93D8", "#AB47BC", "#8E24AA", "#6A1B9A", "#310F4A"]
+    REG_SHADES = dict(zip(ALL_REGIONS, PURPLE_SHADES))
 
+    fig = go.Figure()
+
+    # 1. Densidade global (Contour 2D) para mostrar a concentração dos 5500+ dados sem poluíção visual
+    fig.add_trace(go.Histogram2dContour(
+        x=sub[x_col],
+        y=sub[y_col],
+        colorscale="Purples",
+        reversescale=False,
+        showscale=False,
+        ncontours=15,
+        contours=dict(coloring='fill'),
+        line=dict(width=0),
+        name="Densidade",
+        hovertemplate="Concentração alta de municípios<extra></extra>"
+    ))
+
+    # 2. Centroides (Média) por Região
     for reg in ALL_REGIONS:
-        mask = sub["REGIAO"] == reg
-        fig.add_trace(go.Scattergl(
-            x=sub.loc[mask, x_col],
-            y=sub.loc[mask, y_col],
-            mode="markers",
-            name=reg,
-            marker=dict(color=REG_COLOR[reg], size=6, opacity=0.55),
-            hovertemplate=(
-                "<b>%{customdata[0]}</b><br>"
-                "UF: %{customdata[1]}<br>"
-                f"{AXIS_LABELS.get(x_col, x_col)}: %{{x:,.2f}}<br>"
-                f"{AXIS_LABELS.get(y_col, y_col)}: %{{y:,.2f}}<extra>{reg}</extra>"
-            ),
-            customdata=sub.loc[mask, ["CITY", "STATE"]].values,
-        ))
+        reg_data = sub[sub["REGIAO"] == reg]
+        if not reg_data.empty:
+            mean_x = reg_data[x_col].mean()
+            mean_y = reg_data[y_col].mean()
+            fig.add_trace(go.Scatter(
+                x=[mean_x],
+                y=[mean_y],
+                mode="markers+text",
+                name=f"Média {reg}",
+                text=[reg],
+                textposition="top center",
+                textfont=dict(size=12, color="#1A2B6B"),
+                marker=dict(color=REG_SHADES[reg], size=14, line=dict(color="#FFF", width=2)),
+                hovertemplate=(
+                    f"<b>Centroide: {reg}</b><br>"
+                    f"Média {AXIS_LABELS.get(x_col, x_col)}: %{{x:,.2f}}<br>"
+                    f"Média {AXIS_LABELS.get(y_col, y_col)}: %{{y:,.2f}}<extra></extra>"
+                ),
+            ))
 
+    # 3. Tendência OLS global
     xs_all = sub[x_col].to_numpy()
     ys_all = sub[y_col].to_numpy()
     mask_valid = np.isfinite(xs_all) & np.isfinite(ys_all)
@@ -155,15 +182,22 @@ def _build_scatter(x_col: str, y_col: str) -> go.Figure:
             y=m * x_line + b,
             mode="lines",
             name="Tendência OLS",
-            line=dict(color=STORY_COLORS["accent"], width=1.5, dash="dot"),
+            line=dict(color="#1A2B6B", width=2, dash="dash"),
             showlegend=False,
         ))
 
     fig.update_layout(
         xaxis_title=AXIS_LABELS.get(x_col, x_col),
         yaxis_title=AXIS_LABELS.get(y_col, y_col),
+        annotations=[dict(
+            text="Áreas escuras = mais municípios. Círculos = média de cada região.",
+            xref="paper", yref="paper", x=0.01, y=-0.16,
+            showarrow=False, font=dict(size=11, color="#6B7A9F"),
+        )],
+        margin=dict(b=65),
     )
     return apply_default_layout(fig)
+
 
 
 def _build_heatmap() -> go.Figure:
@@ -177,11 +211,7 @@ def _build_heatmap() -> go.Figure:
         z=corr.values,
         x=labels,
         y=labels,
-        colorscale=[
-            [0.0, "#B45F5F"],
-            [0.5, "#F4F5F7"],
-            [1.0, STORY_COLORS["accent_blue"]],
-        ],
+        colorscale="Blues",
         zmin=-1,
         zmax=1,
         text=corr.values,
@@ -201,10 +231,10 @@ def _build_region_quadrante_chart(tab: pd.DataFrame) -> go.Figure:
         "Outros",
     ]
     colors = {
-        "Alto IDH + Alta Oferta Hoteleira": STORY_COLORS["positive"],
-        "Alto IDH + Estrutura Limitada": STORY_COLORS["accent_blue"],
-        "Alta Oferta + Baixo IDH": STORY_COLORS["warning"],
-        "Outros": STORY_COLORS["context"],
+        "Alto IDH + Alta Oferta Hoteleira":    "#1A237E", # Dark Indigo
+        "Alto IDH + Estrutura Limitada":       "#3F51B5", # Indigo
+        "Alta Oferta + Baixo IDH":             "#7986CB", # Light Indigo
+        "Outros":                              "#C5CAE9", # Very Light Indigo
     }
 
     tab = tab.reindex(index=ALL_REGIONS, columns=quadrante_order, fill_value=0)

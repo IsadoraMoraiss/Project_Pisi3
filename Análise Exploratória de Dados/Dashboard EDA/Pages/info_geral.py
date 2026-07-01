@@ -11,7 +11,7 @@ TEAM_MEMBERS = [
     "Arthur Barbosa",
     "Danielly Nunes",
     "Gabriel Sabino",
-    "Isadora Moraes",
+    "Isadora Morais",
     "Luiz Vinicius"
 ]
 

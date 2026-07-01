@@ -1,6 +1,9 @@
 """
-Brasil em Foco — Dashboard de Análises Exploratórias
+Brasil em Foco — Dashboard de Análises Exploratórias + Predição ML
 Entry point principal da aplicação.
+
+Atualização: adicionada aba "Predição & Insights (ML)" com simulador de
+cenários, explicabilidade SHAP local e benchmarking de municípios.
 """
 
 import dash
@@ -14,6 +17,9 @@ from Pages import (
     univariada,
     bivariada,
     outliers,
+    storytelling,
+    predicao,       # ← nova aba ML
+    clusterizacao,
 )
 
 # ─── App Init ────────────────────────────────────────────────────────────────
@@ -59,26 +65,32 @@ app.layout = html.Div(
 # ─── Callbacks ────────────────────────────────────────────────────────────────
 
 PAGE_MAP = {
-    "info-geral":   info_geral.layout,
-    "visao-geral":  visao_geral.layout,
-    "univariada":   univariada.layout,
-    "bivariada":    bivariada.layout,
-    "outliers":     outliers.layout,
+    "info-geral":     info_geral.layout,
+    "visao-geral":    visao_geral.layout,
+    "univariada":     univariada.layout,
+    "bivariada":      bivariada.layout,
+    "outliers":       outliers.layout,
+    "storytelling":   storytelling.layout,
+    "predicao":       predicao.layout,     # ← nova rota ML
+    "clusterizacao":  clusterizacao.layout,
 }
 
 
 @app.callback(
     Output("page-content", "children"),
     Output("active-page", "data"),
-    Input("nav-info-geral",  "n_clicks"),
-    Input("nav-visao-geral", "n_clicks"),
-    Input("nav-univariada",  "n_clicks"),
-    Input("nav-bivariada",   "n_clicks"),
-    Input("nav-outliers",    "n_clicks"),
+    Input("nav-info-geral",    "n_clicks"),
+    Input("nav-visao-geral",   "n_clicks"),
+    Input("nav-univariada",    "n_clicks"),
+    Input("nav-bivariada",     "n_clicks"),
+    Input("nav-outliers",      "n_clicks"),
+    Input("nav-storytelling",  "n_clicks"),
+    Input("nav-predicao",      "n_clicks"),   # ← novo input
+    Input("nav-clusterizacao", "n_clicks"),
     State("active-page", "data"),
     prevent_initial_call=False,
 )
-def render_page(n1, n2, n3, n4, n5, current):
+def render_page(n1, n2, n3, n4, n5, n6, n7, n8, current):
     ctx = dash.callback_context
     if not ctx.triggered or ctx.triggered[0]["value"] is None:
         page = current or "info-geral"
@@ -90,17 +102,20 @@ def render_page(n1, n2, n3, n4, n5, current):
 
 
 @app.callback(
-    Output("nav-info-geral",  "className"),
-    Output("nav-visao-geral", "className"),
-    Output("nav-univariada",  "className"),
-    Output("nav-bivariada",   "className"),
-    Output("nav-outliers",    "className"),
+    Output("nav-info-geral",     "className"),
+    Output("nav-visao-geral",    "className"),
+    Output("nav-univariada",     "className"),
+    Output("nav-bivariada",      "className"),
+    Output("nav-outliers",       "className"),
+    Output("nav-storytelling",   "className"),
+    Output("nav-predicao",       "className"),    # ← novo output
+    Output("nav-clusterizacao",  "className"),
     Input("active-page", "data"),
 )
 def update_nav_active(page):
     base    = "nav-item"
     active  = "nav-item active"
-    pages   = ["info-geral", "visao-geral", "univariada", "bivariada", "outliers"]
+    pages   = ["info-geral", "visao-geral", "univariada", "bivariada", "outliers", "storytelling", "predicao", "clusterizacao"]
     return [active if p == page else base for p in pages]
 
 

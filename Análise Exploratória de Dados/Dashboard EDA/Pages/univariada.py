@@ -113,12 +113,15 @@ def _build_hist_variable(col: str, region: str) -> go.Figure:
 
 def _build_boxplot_regions(col: str) -> go.Figure:
     fig = go.Figure()
+    # 5 shades of Blue/Azure
+    BLUE_SHADES = ["#64B5F6", "#2196F3", "#1976D2", "#0D47A1", "#051C3D"]
+    REG_SHADES = dict(zip(ALL_REGIONS, BLUE_SHADES))
     for reg in ALL_REGIONS:
         sub  = DF[DF["REGIAO"] == reg][col].dropna()
         cap  = sub.quantile(0.99)
         sub  = sub[sub <= cap]
         fig.add_trace(go.Box(
-            y=sub, name=reg, marker_color=REG_COLOR[reg],
+            y=sub, name=reg, marker_color=REG_SHADES[reg],
             boxmean="sd", boxpoints=False, line_width=1.8,
         ))
     fig.update_layout(yaxis_title=VAR_LABELS.get(col, col), showlegend=False)
@@ -127,10 +130,10 @@ def _build_boxplot_regions(col: str) -> go.Figure:
 
 def _build_quadrante_bar() -> go.Figure:
     QUAD_COLORS = {
-        "Alto IDH + Estrutura Limitada":       STORY_COLORS["warning"],
-        "Alto IDH + Alta Oferta Hoteleira":    STORY_COLORS["positive"],
-        "Alta Oferta + Baixo IDH":             STORY_COLORS["accent"],
-        "Outros":                              STORY_COLORS["context"],
+        "Alto IDH + Alta Oferta Hoteleira":    "#1A237E", # Dark Indigo
+        "Alto IDH + Estrutura Limitada":       "#3F51B5", # Indigo
+        "Alta Oferta + Baixo IDH":             "#7986CB", # Light Indigo
+        "Outros":                              "#C5CAE9", # Very Light Indigo
     }
     grp = DF["quadrante"].value_counts()
     fig = go.Figure(go.Bar(

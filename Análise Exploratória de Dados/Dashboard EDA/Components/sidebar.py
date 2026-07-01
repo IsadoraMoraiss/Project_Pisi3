@@ -37,6 +37,25 @@ NAV_ITEMS = [
         "label": "Outliers",
         "color": "#E74C3C",
     },
+    {
+        "id":    "nav-storytelling",
+        "icon":  "fa-solid fa-book-open",
+        "label": "Storytelling",
+        "color": "#9B59B6",
+    },
+    # ── Aba de Predição & Insights do Modelo de ML ──────────────────────
+    {
+        "id":    "nav-predicao",
+        "icon":  "fa-solid fa-brain",
+        "label": "Predição & Insights (ML)",
+        "color": "#6C3483",
+    },
+    {
+        "id":    "nav-clusterizacao",
+        "icon":  "fa-solid fa-project-diagram",
+        "label": "Clusterização",
+        "color": "#4A6CF7",
+    },
 ]
 
 

@@ -13,9 +13,9 @@ from Components.metric_tile import create_metric_tile
 from data_loader import DF, ALL_REGIONS, REG_COLOR
 
 PALETTE = {
-    "outlier": STORY_COLORS["accent"],
-    "normal": STORY_COLORS["context"],
-    "border": STORY_COLORS["text"],
+    "outlier": "#B71C1C", # Dark Red
+    "normal": "#FFCDD2", # Light Red/Pink
+    "border": "#212121", # Dark Charcoal
 }
 ROBUST_Z_THRESHOLD = 3.5
 
@@ -103,10 +103,10 @@ def _build_boxmulti() -> go.Figure:
     fig = go.Figure()
     # Indicadores centrais em escala 0-100 para comparar concentração e caudas.
     specs = [
-        ("IDHM", "IDHM x100", lambda v: v * 100, STORY_COLORS["accent_blue"]),
-        ("indice_potencial_turistico_proxy", "Potencial", lambda v: v, STORY_COLORS["positive"]),
-        ("indice_conversao_turistica_proxy", "Conversão", lambda v: v, STORY_COLORS["accent"]),
-        ("indice_oferta_hoteleira_observada", "Oferta hotel.", lambda v: v, STORY_COLORS["warning"]),
+        ("IDHM", "IDHM x100", lambda v: v * 100, "#1B5E20"), # Dark Green
+        ("indice_potencial_turistico_proxy", "Potencial", lambda v: v, "#2E7D32"), # Medium Dark Green
+        ("indice_conversao_turistica_proxy", "Conversão", lambda v: v, "#4CAF50"), # Medium Green
+        ("indice_oferta_hoteleira_observada", "Oferta hotel.", lambda v: v, "#81C784"), # Light Green
     ]
     for col, name, fn, color in specs:
         vals = DF[col].dropna()
@@ -122,12 +122,19 @@ def _build_boxmulti() -> go.Figure:
 
 def _build_violin_gap() -> go.Figure:
     fig = go.Figure()
+    ORANGE_SHADES = ["#FFB74D", "#FF9800", "#FB8C00", "#E65100", "#7A2200"]
+    REG_SHADES = dict(zip(ALL_REGIONS, ORANGE_SHADES))
     for reg in ALL_REGIONS:
         sub = DF[DF["REGIAO"] == reg]["potencial_joia_escondida"].dropna()
+        color = REG_SHADES[reg]
+        r = int(color[1:3], 16)
+        g = int(color[3:5], 16)
+        b = int(color[5:7], 16)
+        fill = f"rgba({r},{g},{b},0.15)"
         fig.add_trace(go.Violin(
             y=sub, name=reg, box_visible=True, meanline_visible=True,
-            line_color=REG_COLOR[reg],
-            fillcolor=f"rgba(180,180,255,0.15)",
+            line_color=color,
+            fillcolor=fill,
             opacity=0.75, points=False,
         ))
     fig.update_layout(yaxis_title="Potencial Não Convertido", showlegend=False)
@@ -137,25 +144,38 @@ def _build_violin_gap() -> go.Figure:
 # ─── Figuras dinâmicas ─────────────────────────────────────────────────
 
 def _build_scatter_z(col_x: str, col_y: str) -> go.Figure:
+    """
+    Substitui o scatter massivo de normais por uma Densidade 2D, e plota os outliers isolados por cima.
+    """
     sub = DF[[col_x, col_y, "CITY", "STATE", "REGIAO"]].dropna()
     zx  = _robust_zscore(sub[col_x])
     zy  = _robust_zscore(sub[col_y])
     is_out = (np.abs(zx) > ROBUST_Z_THRESHOLD) | (np.abs(zy) > ROBUST_Z_THRESHOLD)
+    
+    # Separar normais e outliers
+    zx_normal = zx[~is_out]
+    zy_normal = zy[~is_out]
+
     fig = go.Figure()
-    fig.add_trace(go.Scattergl(
-        x=zx[~is_out], y=zy[~is_out], mode="markers", name="Normal",
-        marker=dict(color=PALETTE["normal"], size=5, opacity=0.45),
-        hovertemplate=(
-            "<b>%{customdata[0]}</b><br>"
-            "UF: %{customdata[1]}<br>"
-            "Z robusto x: %{x:.2f}<br>"
-            "Z robusto y: %{y:.2f}<extra>Normal</extra>"
-        ),
-        customdata=sub.loc[~is_out, ["CITY", "STATE"]].values,
+
+    # 1. Densidade (Contour) para o volume de dados normais
+    fig.add_trace(go.Histogram2dContour(
+        x=zx_normal,
+        y=zy_normal,
+        colorscale="Blues",
+        reversescale=False,
+        showscale=False,
+        ncontours=12,
+        contours=dict(coloring='fill'),
+        line=dict(width=0),
+        name="Massa Normal (Densidade)",
+        hovertemplate="Concentração de municípios no padrão<extra></extra>"
     ))
-    fig.add_trace(go.Scattergl(
+
+    # 2. Scatter SOMENTE para os outliers
+    fig.add_trace(go.Scatter(
         x=zx[is_out], y=zy[is_out], mode="markers", name="Outlier",
-        marker=dict(color=PALETTE["outlier"], size=10, symbol="diamond",
+        marker=dict(color=PALETTE["outlier"], size=9, symbol="circle",
                     line=dict(width=1.5, color=PALETTE["border"])),
         hovertemplate=(
             "<b>%{customdata[0]}</b><br>"
@@ -165,13 +185,21 @@ def _build_scatter_z(col_x: str, col_y: str) -> go.Figure:
         ),
         customdata=sub.loc[is_out, ["CITY", "STATE"]].values,
     ))
-    fig.add_shape(type="rect", x0=-ROBUST_Z_THRESHOLD, x1=ROBUST_Z_THRESHOLD,
-                  y0=-ROBUST_Z_THRESHOLD, y1=ROBUST_Z_THRESHOLD,
-                  line=dict(color=STORY_COLORS["accent"], width=1.5, dash="dot"),
-                  fillcolor="rgba(209,73,91,0.05)")
+    # Linhas de threshold
+    for val in [-ROBUST_Z_THRESHOLD, ROBUST_Z_THRESHOLD]:
+        fig.add_hline(y=val, line_dash="dash", line_color="#E74C3C", opacity=0.5)
+        fig.add_vline(x=val, line_dash="dash", line_color="#E74C3C", opacity=0.5)
+
     fig.update_layout(
-        xaxis_title=f"Z-score robusto — {VAR_LABELS.get(col_x, col_x)}",
-        yaxis_title=f"Z-score robusto — {VAR_LABELS.get(col_y, col_y)}",
+        xaxis_title=f"Z-Score robusto ({VAR_LABELS.get(col_x, col_x)})",
+        yaxis_title=f"Z-Score robusto ({VAR_LABELS.get(col_y, col_y)})",
+        annotations=[dict(
+            text="A área azul concentra a densidade de municípios no padrão. Pontos circulares são as exceções.",
+            xref="paper", yref="paper", x=0.01, y=-0.16,
+            showarrow=False, font=dict(size=11, color="#6B7A9F"),
+        )],
+        margin=dict(b=65),
+        showlegend=False,
     )
     return apply_default_layout(fig)
 
@@ -182,10 +210,10 @@ def _build_hist_z(col: str) -> go.Figure:
     cap  = max(5.0, ROBUST_Z_THRESHOLD * 1.4)
     z    = z_raw.clip(-cap, cap)
     fig  = go.Figure(go.Histogram(
-        x=z, nbinsx=40, marker_color=STORY_COLORS["context"], opacity=0.8, name="Z-score robusto",
+        x=z, nbinsx=40, marker_color="#4A90E2", opacity=0.8, name="Z-score robusto",
     ))
-    fig.add_vline(x=ROBUST_Z_THRESHOLD,  line_dash="dot", line_color=STORY_COLORS["accent"], line_width=2)
-    fig.add_vline(x=-ROBUST_Z_THRESHOLD, line_dash="dot", line_color=STORY_COLORS["accent"], line_width=2)
+    fig.add_vline(x=ROBUST_Z_THRESHOLD,  line_dash="dot", line_color="#1F4E79", line_width=2)
+    fig.add_vline(x=-ROBUST_Z_THRESHOLD, line_dash="dot", line_color="#1F4E79", line_width=2)
     n_out = int((np.abs(z_raw) > ROBUST_Z_THRESHOLD).sum())
     fig.update_layout(
         xaxis_title=f"Z-score robusto — {VAR_LABELS.get(col, col)}",

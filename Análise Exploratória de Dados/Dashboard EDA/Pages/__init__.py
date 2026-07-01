@@ -1,1 +1,1 @@
-from . import info_geral, visao_geral, univariada, bivariada, outliers
+from . import info_geral, visao_geral, univariada, bivariada, outliers, storytelling, predicao, clusterizacao
